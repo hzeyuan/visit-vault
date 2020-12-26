@@ -1,0 +1,19 @@
+extend type Query {
+  q(id: String): Info
+}
+
+extend type Mutation {
+  # 修改订单收货地址
+  m(input:minput ): Info
+}
+
+input minput{
+  id:String
+}
+
+# 订单详细信息
+type Info {
+  # 订单ID
+  id: String
+}
+

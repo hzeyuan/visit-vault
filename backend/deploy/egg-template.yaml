@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: egg-template-demo
+  namespace: egg-template
+  labels:
+    app: egg-template-demo
+    app.kubernetes.io/name: egg-template
+    app.kubernetes.io/component: egg-template-demo
+spec:
+  selector:
+    matchLabels:
+      app: egg-template-demo
+      app.kubernetes.io/name: egg-template
+      app.kubernetes.io/component: egg-template-demo
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: egg-template-demo
+        app.kubernetes.io/name: egg-template
+        app.kubernetes.io/component: egg-template-demo
+    spec:
+      containers:
+        - image: template
+          name: egg-template-demo
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 7001
+              protocol: TCP
+              name: web
+          resources:
+            limits:
+              memory: 1Gi
+            requests:
+              memory: 1Gi
+      # imagePullSecrets:
+      #   - name: qcloudregistrykey
+      # volumes:
+      #   - name: timezone
+      #     hostPath:
+      #       path: /etc/localtime
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: egg-template
+  namespace: egg-template
+spec:
+  ports:
+    - name: web
+      port: 7001
+      protocol: TCP
+      targetPort: web
+      # nodePort: 30080
+  selector:
+    app: egg-template-demo
+    app.kubernetes.io/name: egg-template
+    app.kubernetes.io/component: egg-template-demo
+  type: ClusterIP
+  # type: NodePort
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  name: egg-template-demo
+  namespace: egg-template
+spec:
+  rules:
+    - host: egg.template.com
+      http:
+        paths:
+          # API
+          - backend:
+              serviceName: egg-template
+              servicePort: web
+            path: /api(/.*|$)
+          - backend:
+              serviceName: egg-template
+              servicePort: web
+            path: /v2/graphql(/.*|$)

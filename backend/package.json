@@ -1,0 +1,67 @@
+{
+  "name": "template",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "egg": {
+    "typescript": true,
+    "declarations": true
+  },
+  "scripts": {
+    "start": "egg-scripts start  --title=egg-server-template",
+    "stop": "egg-scripts stop --title=egg-server-template",
+    "dev": "egg-bin dev",
+    "debug": "egg-bin debug",
+    "test-local": "egg-bin test",
+    "test": "npm run lint -- --fix && npm run test-local",
+    "cov": "egg-bin cov",
+    "tsc": "ets && tsc -p tsconfig.json",
+    "ci": "npm run lint && npm run cov && npm run tsc",
+    "autod": "autod",
+    "lint": "eslint . --ext .ts",
+    "clean": "ets clean",
+    "codegen": "graphql-codegen --config codegen.yml"
+  },
+  "dependencies": {
+    "egg": "^2.29.1",
+    "egg-apollo-server": "^0.3.0",
+    "egg-cors": "^2.2.3",
+    "egg-scripts": "^2.13.0",
+    "egg-validate": "^2.0.2"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "1.19.4",
+    "@graphql-codegen/typescript": "1.19.0",
+    "@graphql-codegen/typescript-graphql-files-modules": "^1.18.1",
+    "@graphql-codegen/typescript-operations": "^1.17.12",
+    "@graphql-codegen/typescript-resolvers": "^1.18.0",
+    "@graphql-codegen/typescript-type-graphql": "^1.18.2",
+    "@types/mocha": "^2.2.40",
+    "@types/node": "^7.0.12",
+    "@types/supertest": "^2.0.0",
+    "autod": "^3.1.1",
+    "autod-egg": "^1.1.0",
+    "egg-bin": "^4.15.0",
+    "egg-ci": "^1.8.0",
+    "egg-mock": "^3.16.0",
+    "eslint": "^6.7.2",
+    "eslint-config-egg": "^8.0.0",
+    "tslib": "^2.0.3",
+    "typescript": "^4.1.3"
+  },
+  "engines": {
+    "node": ">=8.9.0"
+  },
+  "ci": {
+    "version": "8"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "eslintIgnore": [
+    "coverage"
+  ],
+  "author": "",
+  "license": "MIT"
+}

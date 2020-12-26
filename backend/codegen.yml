@@ -1,0 +1,9 @@
+overwrite: true
+schema: "app/**/*.graphql"
+generates:
+  app/typings/schema.d.ts:
+    plugins:  
+      - "typescript"
+      - "typescript-operations"
+    config:
+      noExport: true
