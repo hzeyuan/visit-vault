@@ -2,10 +2,12 @@
 // Do not modify this file!!!!!!!!!
 
 import 'egg';
+import ExportImage from '../../../app/controller/image';
 import ExportTestResource from '../../../app/controller/testResource';
 
 declare module 'egg' {
   interface IController {
+    image: ExportImage;
     testResource: ExportTestResource;
   }
 }

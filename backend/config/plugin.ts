@@ -9,6 +9,10 @@ const plugin: EggPlugin = {
     enable: true,
     package: 'egg-cors',
   },
+  static: {
+    enable: true,
+    package: 'egg-static',
+  },
   'apollo-server': {
     enable: true,
     package: 'egg-apollo-server',

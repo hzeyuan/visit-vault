@@ -1,5 +1,6 @@
 import { EggAppConfig, EggAppInfo, PowerPartial } from 'egg';
 import graphqlConf from './graphql.conf';
+import * as path from 'path';
 
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>;
@@ -16,13 +17,20 @@ export default (appInfo: EggAppInfo) => {
       ignore: () => true,
     },
   };
+  // config.static = {
+  //   prefix: '/public/',
+  //   dir:['app/public/flags']
+  // }
   config.proxy = true;
   config.cors = {
     credentials: true,
     origin: '*',
     allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS',
   };
-
+  config.static = {
+    prefix: '/public/',
+    dir:[path.join(appInfo.baseDir, '/assets'),path.join(appInfo.baseDir, 'app/public')]
+  }
   config.onerror = {
     // all(err, ctx) {
     //   // 在此处定义针对所有响应类型的错误处理方法
