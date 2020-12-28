@@ -9,7 +9,7 @@ export default (appInfo: EggAppInfo) => {
 
   config.graphql = graphqlConf;
 
-  config.middleware = [ 'graphql', 'errorHandler' ];
+  config.middleware = ['graphql', 'errorHandler'];
 
   config.security = {
     // domainWhiteList: [ 'http://127.0.0.1:8000' ],
@@ -27,10 +27,22 @@ export default (appInfo: EggAppInfo) => {
     origin: '*',
     allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS',
   };
+  // 配置静态文件
   config.static = {
     prefix: '/public/',
-    dir:[path.join(appInfo.baseDir, '/assets'),path.join(appInfo.baseDir, 'app/public')]
-  }
+    dir: [path.join(appInfo.baseDir, '/assets'), path.join(appInfo.baseDir, 'app/public')]
+  };
+
+  // 配置数据库
+  config.typeorm = {
+    client: {
+      type: 'sqlite',
+      database: 'dev',
+      synchronize: true,
+      // logging: true,
+    }
+  };
+
   config.onerror = {
     // all(err, ctx) {
     //   // 在此处定义针对所有响应类型的错误处理方法

@@ -1,0 +1,10 @@
+[
+  {
+    "name": "default",
+    "entitiesDir": "app/entity/sys"
+  },
+  {
+    "name": "test",
+    "entitiesDir": "app/entity/test"
+  }
+]

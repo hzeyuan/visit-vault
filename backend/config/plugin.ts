@@ -1,7 +1,7 @@
 import { EggPlugin } from 'egg';
 
 const plugin: EggPlugin = {
-  valiate: {
+  validate: {
     enable: true,
     package: 'egg-validate',
   },
@@ -9,13 +9,13 @@ const plugin: EggPlugin = {
     enable: true,
     package: 'egg-cors',
   },
-  static: {
-    enable: true,
-    package: 'egg-static',
-  },
   'apollo-server': {
     enable: true,
     package: 'egg-apollo-server',
+  },
+  typeorm: {
+    enable: true,
+    package: '@hackycy/egg-typeorm',
   },
 };
 

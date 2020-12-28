@@ -17,6 +17,7 @@ import 'egg-view';
 import 'egg-validate';
 import 'egg-cors';
 import 'egg-apollo-server';
+import '@hackycy/egg-typeorm';
 import { EggPluginItem } from 'egg';
 declare module 'egg' {
   interface EggPlugin {
@@ -32,8 +33,9 @@ declare module 'egg' {
     static?: EggPluginItem;
     jsonp?: EggPluginItem;
     view?: EggPluginItem;
-    valiate?: EggPluginItem;
+    validate?: EggPluginItem;
     cors?: EggPluginItem;
     'apollo-server'?: EggPluginItem;
+    typeorm?: EggPluginItem;
   }
 }
