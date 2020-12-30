@@ -1,5 +1,5 @@
-import { actorReferenceCollection } from "../database/index";
-import { generateHash } from "../utils/hash";
+import { actorReferenceCollection } from '../database/index';
+import { generateHash } from '../utils/hash';
 
 export default class ActorReference {
   _id: string;
@@ -19,20 +19,20 @@ export default class ActorReference {
   }
 
   static async getByActor(label: string): Promise<ActorReference[]> {
-    return actorReferenceCollection.query("actor-index", label);
+    return actorReferenceCollection.query('actor-index', label);
   }
 
   static async getByItem(item: string): Promise<ActorReference[]> {
-    return actorReferenceCollection.query("item-index", item);
+    return actorReferenceCollection.query('item-index', item);
   }
 
   static async getByType(type: string): Promise<ActorReference[]> {
-    return actorReferenceCollection.query("type-index", type);
+    return actorReferenceCollection.query('type-index', type);
   }
 
   static async get(from: string, to: string): Promise<ActorReference | undefined> {
-    const fromReferences = await actorReferenceCollection.query("item-index", from);
-    return fromReferences.find((r) => r.actor === to);
+    const fromReferences = await actorReferenceCollection.query('item-index', from);
+    return fromReferences.find(r => r.actor === to);
   }
 
   static async removeByActor(id: string): Promise<void> {

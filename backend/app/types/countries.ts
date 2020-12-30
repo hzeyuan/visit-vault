@@ -1,8 +1,8 @@
-import countries, { ICountry } from "../data/countries";
+import countries, { ICountry } from '../data/countries';
 
 const countryMap = (() => {
   const map = {} as Record<string, ICountry>;
-  countries.forEach((c) => {
+  countries.forEach(c => {
     map[c.alpha2] = c;
   });
   return map;

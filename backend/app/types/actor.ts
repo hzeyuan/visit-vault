@@ -1,22 +1,22 @@
-import moment from "moment";
+import moment from 'moment';
 
-import { getConfig } from "../config";
-import { actorCollection, actorReferenceCollection } from "../database";
-import { buildActorExtractor } from "../extractor";
-import { ignoreSingleNames } from "../matching/matcher";
-import { searchActors } from "../search/actor";
-import { indexScenes, searchUnmatchedItem } from "../search/scene";
-import { mapAsync } from "../utils/async";
-import { generateHash } from "../utils/hash";
-import * as logger from "../utils/logger";
-import { arrayDiff, createObjectSet } from "../utils/misc";
-import ActorReference from "./actor_reference";
-import Label from "./label";
-import Movie from "./movie";
-import Scene from "./scene";
-import Studio from "./studio";
-import SceneView from "./watch";
-import ora = require("ora");
+import { getConfig } from '../config';
+import { actorCollection, actorReferenceCollection } from '../database';
+import { buildActorExtractor } from '../extractor';
+import { ignoreSingleNames } from '../matching/matcher';
+import { searchActors } from '../search/actor';
+import { indexScenes, searchUnmatchedItem } from '../search/scene';
+import { mapAsync } from '../utils/async';
+import { generateHash } from '../utils/hash';
+import * as logger from '../utils/logger';
+import { arrayDiff, createObjectSet } from '../utils/misc';
+import ActorReference from './actor_reference';
+import Label from './label';
+import Movie from './movie';
+import Scene from './scene';
+import Studio from './studio';
+import SceneView from './watch';
+import ora = require('ora');
 
 export default class Actor {
   _id: string;
@@ -38,7 +38,7 @@ export default class Actor {
 
   static async getStudioFeatures(actor: Actor): Promise<Studio[]> {
     const scenes = await Scene.getByActor(actor._id);
-    return Studio.getBulk(scenes.map((scene) => scene.studio!).filter(Boolean));
+    return Studio.getBulk(scenes.map(scene => scene.studio!).filter(Boolean));
   }
 
   static async getAverageRating(actor: Actor): Promise<number> {
@@ -50,7 +50,7 @@ export default class Actor {
 
   static getAge(actor: Actor): number | null {
     if (actor.bornOn) {
-      return moment().diff(actor.bornOn, "years");
+      return moment().diff(actor.bornOn, 'years');
     }
     return null;
   }
@@ -60,7 +60,7 @@ export default class Actor {
   }
 
   static async setLabels(actor: Actor, labelIds: string[]): Promise<void> {
-    return Label.setForItem(actor._id, labelIds, "actor");
+    return Label.setForItem(actor._id, labelIds, 'actor');
   }
 
   static async getLabels(actor: Actor): Promise<Label[]> {
@@ -70,7 +70,7 @@ export default class Actor {
   static async setForItem(itemId: string, actorIds: string[], type: string): Promise<void> {
     const oldRefs = await ActorReference.getByItem(itemId);
 
-    const { removed, added } = arrayDiff(oldRefs, [...new Set(actorIds)], "actor", (l) => l);
+    const { removed, added } = arrayDiff(oldRefs, [ ...new Set(actorIds) ], 'actor', l => l);
 
     for (const oldRef of removed) {
       await actorReferenceCollection.remove(oldRef._id);
@@ -86,7 +86,7 @@ export default class Actor {
   static async addForItem(itemId: string, actorIds: string[], type: string): Promise<void> {
     const oldRefs = await ActorReference.getByItem(itemId);
 
-    const { added } = arrayDiff(oldRefs, [...new Set(actorIds)], "actor", (l) => l);
+    const { added } = arrayDiff(oldRefs, [ ...new Set(actorIds) ], 'actor', l => l);
 
     for (const id of added) {
       const actorRef = new ActorReference(itemId, id, type);
@@ -111,7 +111,7 @@ export default class Actor {
     const scenes = await Scene.getByActor(actor._id);
 
     return (
-      await mapAsync(scenes, (scene) => {
+      await mapAsync(scenes, scene => {
         return SceneView.getByScene(scene._id);
       })
     )
@@ -124,10 +124,10 @@ export default class Actor {
   }
 
   static async getLabelUsage(): Promise<
-    {
-      label: Label;
-      score: number;
-    }[]
+  {
+    label: Label;
+    score: number;
+  }[]
   > {
     const scores = {} as Record<string, { label: Label; score: number }>;
     for (const actor of await Actor.getAll()) {
@@ -136,13 +136,13 @@ export default class Actor {
         scores[label._id] = item
           ? { label, score: item.score + 1 }
           : {
-              label,
-              score: 0,
-            };
+            label,
+            score: 0,
+          };
       }
     }
     return Object.keys(scores)
-      .map((key) => ({
+      .map(key => ({
         label: scores[key].label,
         score: scores[key].score,
       }))
@@ -151,8 +151,8 @@ export default class Actor {
 
   static async getTopActors(skip = 0, take = 0): Promise<(Actor | null)[]> {
     const result = await searchActors({
-      sortBy: "score",
-      sortDir: "desc",
+      sortBy: 'score',
+      sortDir: 'desc',
       skip,
       take,
     });
@@ -162,29 +162,29 @@ export default class Actor {
   constructor(name: string, aliases: string[] = []) {
     this._id = `ac_${generateHash()}`;
     this.name = name.trim();
-    this.aliases = [...new Set(aliases.map((tag) => tag.trim()))];
+    this.aliases = [ ...new Set(aliases.map(tag => tag.trim())) ];
   }
 
   static async getMovies(actor: Actor): Promise<Movie[]> {
     const scenes = await Scene.getByActor(actor._id);
     const movies = await mapAsync(scenes, Scene.getMovies);
-    return createObjectSet(movies.flat(), "_id");
+    return createObjectSet(movies.flat(), '_id');
   }
 
   static async getCollabs(
-    actor: Actor
+    actor: Actor,
   ): Promise<
     {
       scene: Scene;
       actors: Actor[];
     }[]
-  > {
+    > {
     const scenes = await Scene.getByActor(actor._id);
 
-    return await mapAsync(scenes, async (scene) => {
+    return await mapAsync(scenes, async scene => {
       return {
         scene,
-        actors: (await Scene.getActors(scene)).filter((ac) => ac._id !== actor._id),
+        actors: (await Scene.getActors(scene)).filter(ac => ac._id !== actor._id),
       };
     });
   }
@@ -233,24 +233,24 @@ export default class Actor {
     // Prevent looping on scenes if we know it'll never be matched
     if (
       config.matching.matcher.options.ignoreSingleNames &&
-      !ignoreSingleNames([actor.name]).length
+      !ignoreSingleNames([ actor.name ]).length
     ) {
       return;
     }
 
-    const res = await searchUnmatchedItem(actor, "actors");
+    const res = await searchUnmatchedItem(actor, 'actors');
     if (!res.items.length) {
       logger.log(`No unmatched scenes to attach "${actor.name}" to`);
       return;
     }
 
-    const localExtractActors = await buildActorExtractor([actor]);
+    const localExtractActors = await buildActorExtractor([ actor ]);
     const matchedScenes: Scene[] = [];
 
     logger.log(`Attaching actor "${actor.name}" labels to ${res.items.length} potential scenes`);
     let sceneIterationCount = 0;
     const loader = ora(
-      `Attaching actor "${actor.name}" to unmatched scenes. Checking scenes: ${sceneIterationCount}/${res.items.length}`
+      `Attaching actor "${actor.name}" to unmatched scenes. Checking scenes: ${sceneIterationCount}/${res.items.length}`,
     ).start();
 
     for (const scene of await Scene.getBulk(res.items)) {
@@ -264,12 +264,12 @@ export default class Actor {
           await Scene.addLabels(scene, actorLabels);
         }
 
-        await Scene.addActors(scene, [actor._id]);
+        await Scene.addActors(scene, [ actor._id ]);
       }
     }
 
     loader.succeed(
-      `Attached actor "${actor.name}" to ${matchedScenes.length} scenes out of ${res.items.length} potential matches`
+      `Attached actor "${actor.name}" to ${matchedScenes.length} scenes out of ${res.items.length} potential matches`,
     );
 
     try {
@@ -279,12 +279,12 @@ export default class Actor {
     }
     logger.log(
       `Added actor "${actor.name}" ${
-        actorLabels?.length ? "with" : "without"
+        actorLabels?.length ? 'with' : 'without'
       } labels to scenes : ${JSON.stringify(
-        matchedScenes.map((s) => s._id),
+        matchedScenes.map(s => s._id),
         null,
-        2
-      )}`
+        2,
+      )}`,
     );
   }
 }

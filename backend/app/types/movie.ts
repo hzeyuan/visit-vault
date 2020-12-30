@@ -3,15 +3,15 @@ import {
   movieCollection,
   movieSceneCollection,
   sceneCollection,
-} from "../database";
-import { mapAsync } from "../utils/async";
-import { generateHash } from "../utils/hash";
-import * as logger from "../utils/logger";
-import { arrayDiff } from "../utils/misc";
-import Actor from "./actor";
-import Label from "./label";
-import MovieScene from "./movie_scene";
-import Scene from "./scene";
+} from '../database';
+import { mapAsync } from '../utils/async';
+import { generateHash } from '../utils/hash';
+import * as logger from '../utils/logger';
+import { arrayDiff } from '../utils/misc';
+import Actor from './actor';
+import Label from './label';
+import MovieScene from './movie_scene';
+import Scene from './scene';
 
 export default class Movie {
   _id: string;
@@ -31,7 +31,7 @@ export default class Movie {
 
   static async calculateDuration(movie: Movie): Promise<number | null> {
     const scenesWithSource = (await Movie.getScenes(movie)).filter(
-      (scene) => scene.meta && scene.path
+      scene => scene.meta && scene.path,
     );
 
     if (!scenesWithSource.length) return null;
@@ -66,17 +66,17 @@ export default class Movie {
 
   static async getByScene(id: string): Promise<Movie[]> {
     const movieScenes = await MovieScene.getByScene(id);
-    return (await Movie.getBulk(movieScenes.map((ms) => ms.movie))).filter(Boolean);
+    return (await Movie.getBulk(movieScenes.map(ms => ms.movie))).filter(Boolean);
   }
 
   static getByStudio(studioId: string): Promise<Movie[]> {
-    return movieCollection.query("studio-index", studioId);
+    return movieCollection.query('studio-index', studioId);
   }
 
   static async getLabels(movie: Movie): Promise<Label[]> {
     const scenes = await Movie.getScenes(movie);
     const labelIds = [
-      ...new Set((await mapAsync(scenes, Scene.getLabels)).flat().map((a) => a._id)),
+      ...new Set((await mapAsync(scenes, Scene.getLabels)).flat().map(a => a._id)),
     ];
     return await Label.getBulk(labelIds);
   }
@@ -84,7 +84,7 @@ export default class Movie {
   static async getActors(movie: Movie): Promise<Actor[]> {
     const scenes = await Movie.getScenes(movie);
     const actorIds = [
-      ...new Set((await mapAsync(scenes, Scene.getActors)).flat().map((a) => a._id)),
+      ...new Set((await mapAsync(scenes, Scene.getActors)).flat().map(a => a._id)),
     ];
     return (await actorCollection.getBulk(actorIds))
       .filter(Boolean)
@@ -94,7 +94,7 @@ export default class Movie {
   static async setScenes(movie: Movie, sceneIds: string[]): Promise<void> {
     const oldRefs = await MovieScene.getByMovie(movie._id);
 
-    const { removed, added } = arrayDiff(oldRefs, [...new Set(sceneIds)], "scene", (l) => l);
+    const { removed, added } = arrayDiff(oldRefs, [ ...new Set(sceneIds) ], 'scene', l => l);
 
     for (const oldRef of removed) {
       await movieSceneCollection.remove(oldRef._id);
@@ -111,16 +111,16 @@ export default class Movie {
 
   static async getScenes(movie: Movie): Promise<Scene[]> {
     const references = await MovieScene.getByMovie(movie._id);
-    return (await sceneCollection.getBulk(references.map((r) => r.scene))).filter(Boolean);
+    return (await sceneCollection.getBulk(references.map(r => r.scene))).filter(Boolean);
   }
 
   static async getRating(movie: Movie): Promise<number> {
-    const scenesWithScore = (await Movie.getScenes(movie)).filter((scene) => !!scene.rating);
+    const scenesWithScore = (await Movie.getScenes(movie)).filter(scene => !!scene.rating);
 
     if (!scenesWithScore.length) return 0;
 
     return Math.round(
-      scenesWithScore.reduce((rating, scene) => rating + scene.rating, 0) / scenesWithScore.length
+      scenesWithScore.reduce((rating, scene) => rating + scene.rating, 0) / scenesWithScore.length,
     );
   }
 

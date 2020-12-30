@@ -1,12 +1,12 @@
-import Vibrant from "node-vibrant";
+import Vibrant from 'node-vibrant';
 
-import { actorCollection, imageCollection } from "../database";
-import { unlinkAsync } from "../utils/fs/async";
-import { generateHash } from "../utils/hash";
-import * as logger from "../utils/logger";
-import Actor from "./actor";
-import ActorReference from "./actor_reference";
-import Label from "./label";
+import { actorCollection, imageCollection } from '../database';
+import { unlinkAsync } from '../utils/fs/async';
+import { generateHash } from '../utils/hash';
+import * as logger from '../utils/logger';
+import Actor from './actor';
+import ActorReference from './actor_reference';
+import Label from './label';
 
 export class ImageDimensions {
   width: number | null = null;
@@ -35,38 +35,38 @@ export default class Image {
   hash: string | null = null;
   color: string | null = null;
 
-  static async extractColor(image: Image): Promise<void> {
-    if (!image.path) return;
+  // static async extractColor(image: Image): Promise<void> {
+  //   if (!image.path) return;
 
-    const palette = await Vibrant.from(image.path).getPalette();
+  //   const palette = await Vibrant.from(image.path).getPalette();
 
-    const color =
-      palette.DarkVibrant?.getHex() ||
-      palette.DarkMuted?.getHex() ||
-      palette.Vibrant?.getHex() ||
-      palette.Vibrant?.getHex();
+  //   const color =
+  //     palette.DarkVibrant?.getHex() ||
+  //     palette.DarkMuted?.getHex() ||
+  //     palette.Vibrant?.getHex() ||
+  //     palette.Vibrant?.getHex();
 
-    if (color) {
-      image.color = color;
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      imageCollection.upsert(image._id, image).catch(() => {});
-    }
-  }
+  //   if (color) {
+  //     image.color = color;
+  //     // eslint-disable-next-line @typescript-eslint/no-empty-function
+  //     imageCollection.upsert(image._id, image).catch(() => {});
+  //   }
+  // }
 
-  static color(image: Image): string | null {
-    if (!image.path) return null;
-    if (image.color) return image.color;
+  // static color(image: Image): string | null {
+  //   if (!image.path) return null;
+  //   if (image.color) return image.color;
 
-    if (image.path) {
-      Image.extractColor(image).catch((err: Error) => {
-        logger.error("Image color extraction failed");
-        logger.log(err);
-        logger.error(image.path, err.message);
-      });
-    }
+  //   if (image.path) {
+  //     Image.extractColor(image).catch((err: Error) => {
+  //       logger.error("Image color extraction failed");
+  //       logger.log(err);
+  //       logger.error(image.path, err.message);
+  //     });
+  //   }
 
-    return null;
-  }
+  //   return null;
+  // }
 
   static async remove(image: Image): Promise<void> {
     await imageCollection.remove(image._id);
@@ -101,10 +101,11 @@ export default class Image {
   }
 
   static async getByScene(id: string): Promise<Image[]> {
-    return imageCollection.query("scene-index", id);
+    return imageCollection.query('scene-index', id);
   }
 
   static async getById(_id: string): Promise<Image | null> {
+
     return imageCollection.get(_id);
   }
 
@@ -118,21 +119,21 @@ export default class Image {
 
   static async getActors(image: Image): Promise<Actor[]> {
     const references = await ActorReference.getByItem(image._id);
-    return (await actorCollection.getBulk(references.map((r) => r.actor)))
+    return (await actorCollection.getBulk(references.map(r => r.actor)))
       .filter(Boolean)
       .sort((a, b) => a.name.localeCompare(b.name));
   }
 
   static async setActors(image: Image, actorIds: string[]): Promise<void> {
-    return Actor.setForItem(image._id, actorIds, "image");
+    return Actor.setForItem(image._id, actorIds, 'image');
   }
 
   static async addActors(image: Image, actorIds: string[]): Promise<void> {
-    return Actor.addForItem(image._id, actorIds, "image");
+    return Actor.addForItem(image._id, actorIds, 'image');
   }
 
   static async setLabels(image: Image, labelIds: string[]): Promise<void> {
-    return Label.setForItem(image._id, labelIds, "image");
+    return Label.setForItem(image._id, labelIds, 'image');
   }
 
   static async getLabels(image: Image): Promise<Label[]> {
@@ -140,7 +141,7 @@ export default class Image {
   }
 
   static async getImageByPath(path: string): Promise<Image | undefined> {
-    return (await imageCollection.query("path-index", encodeURIComponent(path)))[0] as
+    return (await imageCollection.query('path-index', encodeURIComponent(path)))[0] as
       | Image
       | undefined;
   }

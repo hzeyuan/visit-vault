@@ -1,17 +1,17 @@
-import { getConfig } from "../config";
-import { sceneCollection, studioCollection } from "../database";
-import { buildStudioExtractor } from "../extractor";
-import { ignoreSingleNames } from "../matching/matcher";
-import { indexScenes, searchUnmatchedItem } from "../search/scene";
-import { mapAsync } from "../utils/async";
-import { generateHash } from "../utils/hash";
-import * as logger from "../utils/logger";
-import { createObjectSet } from "../utils/misc";
-import Actor from "./actor";
-import Label from "./label";
-import Movie from "./movie";
-import Scene from "./scene";
-import ora = require("ora");
+import { getConfig } from '../config';
+import { sceneCollection, studioCollection } from '../database';
+import { buildStudioExtractor } from '../extractor';
+import { ignoreSingleNames } from '../matching/matcher';
+import { indexScenes, searchUnmatchedItem } from '../search/scene';
+import { mapAsync } from '../utils/async';
+import { generateHash } from '../utils/hash';
+import * as logger from '../utils/logger';
+import { createObjectSet } from '../utils/misc';
+import Actor from './actor';
+import Label from './label';
+import Movie from './movie';
+import Scene from './scene';
+import ora = require('ora');
 
 export default class Studio {
   _id: string;
@@ -73,7 +73,7 @@ export default class Studio {
     const subStudios = await Studio.getSubStudios(studio._id);
 
     const scenesOfSubStudios = (
-      await Promise.all(subStudios.map((child) => Studio.getScenes(child)))
+      await Promise.all(subStudios.map(child => Studio.getScenes(child)))
     ).flat();
 
     return scenes.concat(scenesOfSubStudios);
@@ -84,7 +84,7 @@ export default class Studio {
 
     const moviesOfSubStudios = (
       await Promise.all(
-        (await Studio.getSubStudios(studio._id)).map((child) => Studio.getMovies(child))
+        (await Studio.getSubStudios(studio._id)).map(child => Studio.getMovies(child)),
       )
     ).flat();
 
@@ -92,19 +92,19 @@ export default class Studio {
   }
 
   static async getSubStudios(studioId: string): Promise<Studio[]> {
-    return studioCollection.query("parent-index", studioId);
+    return studioCollection.query('parent-index', studioId);
   }
 
   static async getActors(studio: Studio): Promise<Actor[]> {
     const scenes = await Studio.getScenes(studio);
     const actorIds = [
-      ...new Set((await mapAsync(scenes, Scene.getActors)).flat().map((a) => a._id)),
+      ...new Set((await mapAsync(scenes, Scene.getActors)).flat().map(a => a._id)),
     ];
     return await Actor.getBulk(actorIds);
   }
 
   static async setLabels(studio: Studio, labelIds: string[]): Promise<void> {
-    return Label.setForItem(studio._id, labelIds, "studio");
+    return Label.setForItem(studio._id, labelIds, 'studio');
   }
 
   static async getLabels(studio: Studio): Promise<Label[]> {
@@ -114,7 +114,7 @@ export default class Studio {
   static async inferLabels(studio: Studio): Promise<Label[]> {
     const scenes = await Studio.getScenes(studio);
     const labels = (await mapAsync(scenes, Scene.getLabels)).flat();
-    return createObjectSet(labels, "_id");
+    return createObjectSet(labels, '_id');
   }
 
   /**
@@ -161,24 +161,24 @@ export default class Studio {
     // Prevent looping on scenes if we know it'll never be matched
     if (
       config.matching.matcher.options.ignoreSingleNames &&
-      !ignoreSingleNames([studio.name]).length
+      !ignoreSingleNames([ studio.name ]).length
     ) {
       return;
     }
 
-    const res = await searchUnmatchedItem(studio, "studios");
+    const res = await searchUnmatchedItem(studio, 'studios');
     if (!res.items.length) {
       logger.log(`No unmatched scenes to attach "${studio.name}" to`);
       return;
     }
 
-    const localExtractStudios = await buildStudioExtractor([studio]);
+    const localExtractStudios = await buildStudioExtractor([ studio ]);
     const matchedScenes: Scene[] = [];
 
     logger.log(`Attaching studio "${studio.name}" labels to ${res.items.length} potential scenes`);
     let sceneIterationCount = 0;
     const loader = ora(
-      `Attaching studio "${studio.name}" to unmatched scenes. Checking scenes: ${sceneIterationCount}/${res.items.length}`
+      `Attaching studio "${studio.name}" to unmatched scenes. Checking scenes: ${sceneIterationCount}/${res.items.length}`,
     ).start();
 
     for (const scene of await Scene.getBulk(res.items)) {
@@ -199,7 +199,7 @@ export default class Studio {
     }
 
     loader.succeed(
-      `Attached studio "${studio.name}" to ${matchedScenes.length} scenes out of ${res.items.length} potential matches`
+      `Attached studio "${studio.name}" to ${matchedScenes.length} scenes out of ${res.items.length} potential matches`,
     );
 
     try {
@@ -209,12 +209,12 @@ export default class Studio {
     }
     logger.log(
       `Added studio "${studio.name}" ${
-        studioLabels?.length ? "with" : "without"
+        studioLabels?.length ? 'with' : 'without'
       } labels to scenes : ${JSON.stringify(
-        matchedScenes.map((s) => s._id),
+        matchedScenes.map(s => s._id),
         null,
-        2
-      )}`
+        2,
+      )}`,
     );
   }
 }

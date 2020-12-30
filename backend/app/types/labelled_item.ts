@@ -1,5 +1,5 @@
-import { labelledItemCollection } from "../database/index";
-import { generateHash } from "../utils/hash";
+import { labelledItemCollection } from '../database/index';
+import { generateHash } from '../utils/hash';
 
 export default class LabelledItem {
   _id: string;
@@ -19,20 +19,20 @@ export default class LabelledItem {
   }
 
   static async getByLabel(label: string): Promise<LabelledItem[]> {
-    return labelledItemCollection.query("label-index", label);
+    return labelledItemCollection.query('label-index', label);
   }
 
   static async getByItem(item: string): Promise<LabelledItem[]> {
-    return labelledItemCollection.query("item-index", item);
+    return labelledItemCollection.query('item-index', item);
   }
 
   static async getByType(type: string): Promise<LabelledItem[]> {
-    return labelledItemCollection.query("type-index", type);
+    return labelledItemCollection.query('type-index', type);
   }
 
   static async get(from: string, to: string): Promise<LabelledItem | undefined> {
-    const fromReferences = await labelledItemCollection.query("item-index", from);
-    return fromReferences.find((r) => r.label === to);
+    const fromReferences = await labelledItemCollection.query('item-index', from);
+    return fromReferences.find(r => r.label === to);
   }
 
   static async removeByLabel(id: string): Promise<void> {

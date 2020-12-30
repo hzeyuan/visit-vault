@@ -1,21 +1,21 @@
-import { customFieldCollection } from "../database";
-import { generateHash } from "../utils/hash";
+import { customFieldCollection } from '../database';
+import { generateHash } from '../utils/hash';
 
 export enum CustomFieldType {
-  NUMBER = "NUMBER",
-  STRING = "STRING",
-  BOOLEAN = "BOOLEAN",
-  SINGLE_SELECT = "SINGLE_SELECT",
-  MULTI_SELECT = "MULTI_SELECT",
+  NUMBER = 'NUMBER',
+  STRING = 'STRING',
+  BOOLEAN = 'BOOLEAN',
+  SINGLE_SELECT = 'SINGLE_SELECT',
+  MULTI_SELECT = 'MULTI_SELECT',
 }
 
 export enum CustomFieldTarget {
-  SCENES = "SCENES",
-  ACTORS = "ACTORS",
-  MOVIES = "MOVIES",
-  IMAGES = "IMAGES",
-  STUDIOS = "STUDIOS",
-  ALBUMS = "ALBUMS",
+  SCENES = 'SCENES',
+  ACTORS = 'ACTORS',
+  MOVIES = 'MOVIES',
+  IMAGES = 'IMAGES',
+  STUDIOS = 'STUDIOS',
+  ALBUMS = 'ALBUMS',
 }
 
 export default class CustomField {
@@ -36,7 +36,7 @@ export default class CustomField {
   static async find(name: string): Promise<CustomField | undefined> {
     name = name.toLowerCase().trim();
     const allFields = await CustomField.getAll();
-    return allFields.find((field) => field.name === name);
+    return allFields.find(field => field.name === name);
   }
 
   static async remove(_id: string): Promise<void> {

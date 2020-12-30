@@ -557,8 +557,8 @@ export default class Lightbox extends Vue {
   }
 
   imageLink(image: any) {
-    return 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fa2.att.hudong.com%2F27%2F81%2F01200000194677136358818023076.jpg&refer=http%3A%2F%2Fa2.att.hudong.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1611576383&t=d49c4f209bcd766c6887a759c449a201'
-    // return `${serverBase}/media/image/${image._id}?password=${localStorage.getItem("password")}`;
+    // return 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fa2.att.hudong.com%2F27%2F81%2F01200000194677136358818023076.jpg&refer=http%3A%2F%2Fa2.att.hudong.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1611576383&t=d49c4f209bcd766c6887a759c449a201'
+    return `${serverBase}/media/image/${image._id}?password=${localStorage.getItem("password")}`;
   }
 
   get currentImage() {

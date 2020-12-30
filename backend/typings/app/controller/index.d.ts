@@ -3,11 +3,13 @@
 
 import 'egg';
 import ExportImage from '../../../app/controller/image';
+import ExportOrm from '../../../app/controller/orm';
 import ExportTestResource from '../../../app/controller/testResource';
 
 declare module 'egg' {
   interface IController {
     image: ExportImage;
+    orm: ExportOrm;
     testResource: ExportTestResource;
   }
 }

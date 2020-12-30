@@ -3,16 +3,16 @@
 
 import 'egg';
 import { TreeRepository, Repository } from 'typeorm'
-import SysUser from '../app/entity/sys/user'
+import SysImage from '../app/entity/sys/Image'
 
 declare module 'egg' {
   interface Context {
     entity: {
-      User: typeof SysUser
+      Image: typeof SysImage
       test: {}
     }
     repo: {
-      User: Repository<SysUser>
+      Image: Repository<SysImage>
       test: {}
     }
   }

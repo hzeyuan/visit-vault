@@ -1,13 +1,13 @@
-import * as path from "path";
+import * as path from 'path';
 
-import { imageCollection, markerCollection } from "../database";
-import { singleScreenshot } from "../ffmpeg/screenshot";
-import { generateHash } from "../utils/hash";
-import * as logger from "../utils/logger";
-import { libraryPath } from "../utils/path";
-import Image from "./image";
-import Label from "./label";
-import Scene from "./scene";
+import { imageCollection, markerCollection } from '../database';
+import { singleScreenshot } from '../ffmpeg/screenshot';
+import { generateHash } from '../utils/hash';
+import * as logger from '../utils/logger';
+import { libraryPath } from '../utils/path';
+import Image from './image';
+import Label from './label';
+import Scene from './scene';
 
 // import Actor from "./actor";
 // import ActorReference from "./actor_reference";
@@ -33,15 +33,15 @@ export default class Marker {
 
     logger.log(`Creating thumbnail for marker ${marker._id}`);
     const image = new Image(`${marker.name} (thumbnail)`);
-    const imagePath = `${path.join(libraryPath("thumbnails/markers"), image._id)}.jpg`;
+    const imagePath = `${path.join(libraryPath('thumbnails/markers'), image._id)}.jpg`;
     image.path = imagePath;
     image.scene = marker.scene;
     marker.thumbnail = image._id;
 
-    const actors = (await Scene.getActors(scene)).map((l) => l._id);
+    const actors = (await Scene.getActors(scene)).map(l => l._id);
     await Image.setActors(image, actors);
 
-    const labels = (await Marker.getLabels(marker)).map((l) => l._id);
+    const labels = (await Marker.getLabels(marker)).map(l => l._id);
     await Image.setLabels(image, labels);
 
     await singleScreenshot(scene.path, imagePath, marker.time + 15, 480);
@@ -50,7 +50,7 @@ export default class Marker {
   }
 
   static async setLabels(marker: Marker, labelIds: string[]): Promise<void> {
-    return Label.setForItem(marker._id, labelIds, "marker");
+    return Label.setForItem(marker._id, labelIds, 'marker');
   }
 
   static async getLabels(marker: Marker): Promise<Label[]> {
@@ -65,7 +65,7 @@ export default class Marker {
   }
 
   static async getByScene(sceneId: string): Promise<Marker[]> {
-    return markerCollection.query("scene-index", sceneId);
+    return markerCollection.query('scene-index', sceneId);
   }
 
   static async getById(_id: string): Promise<Marker | null> {

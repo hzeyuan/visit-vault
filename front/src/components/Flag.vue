@@ -12,7 +12,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { serverBase } from "../apollo";
-import { getNationality } from "../../../src/types/countries";
+// import { getNationality } from "../../../src/types/countries";
 
 @Component
 export default class Flag extends Vue {
@@ -20,8 +20,8 @@ export default class Flag extends Vue {
   @Prop({ default: 30 }) width!: number;
 
   get name() {
-    const nation = getNationality(this.value);
-    if (nation) return nation.name;
+    // const nation = getNationality(this.value);
+    // if (nation) return nation.name;
     return "<Invalid nationality>";
   }
 
