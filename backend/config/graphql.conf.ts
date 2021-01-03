@@ -3,7 +3,7 @@ export default {
   app: true, // 是否加载到 app 上,默认为 true
   agent: false, // 是否加载到 agent 上,默认为 false
   graphiql: true, // 是否加载开发者工具 playground,默认为 true
-  uploads: false, // 是否开启文件上传功能，默认开启
+  uploads: true, // 是否开启文件上传功能，默认开启
   // 是否添加默认的 type Query,Mutation,默认为true
   // 如果为true须使用 extend type Query|extend type Mutation,因为graphql规定同一个type只能定义一个
   // 带来的好处时 egg/graphql 下不用再新建query,mutation目录

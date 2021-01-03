@@ -1,7 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
+
 @Entity()
-class Image {
+export class Image {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
@@ -35,5 +36,3 @@ class Image {
   @Column()
   color: string;
 }
-
-export default Image;

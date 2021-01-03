@@ -1,7 +1,7 @@
 
   scalar Long
   scalar Object
-  scalar Upload
+  # scalar Upload
 
   type SceneView {
     _id: String!

@@ -7,11 +7,11 @@ export default class ImageController extends Controller {
   public async image() {
     console.log('image', this.ctx.params);
     // const image = await Image.getById(this.ctx.params.image);
-    const image = await this.ctx.service.image.getById(this.ctx.params.image);
+    // const image = await this.ctx.service.image.getById(this.ctx.params.image);
     // todo :返回一个image对象
-    // const image = {
-    //     path:'public/flags/ad.svg'
-    // } as Image;
+    const image = {
+        path:'public/flags/ad.svg'
+    } as Image;
     if (image && image.path) {
       const resolved = path.resolve(image.path);
       if (!fs.existsSync(resolved)) this.ctx.redirect('/broken');

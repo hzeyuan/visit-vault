@@ -31,7 +31,9 @@
     "egg-sequelize": "^6.0.0",
     "egg-static": "^2.2.0",
     "egg-validate": "^2.0.2",
-    "sqlite3": "^5.0.0"
+    "jimp": "^0.14.0",
+    "sqlite3": "^5.0.0",
+    "ts-node": "^9.1.1"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "1.19.4",
@@ -41,7 +43,7 @@
     "@graphql-codegen/typescript-resolvers": "^1.18.0",
     "@graphql-codegen/typescript-type-graphql": "^1.18.2",
     "@types/mocha": "^2.2.40",
-    "@types/node": "^7.0.12",
+    "@types/node": "^14.14.13",
     "@types/supertest": "^2.0.0",
     "autod": "^3.1.1",
     "autod-egg": "^1.1.0",
