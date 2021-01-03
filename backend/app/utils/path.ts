@@ -4,7 +4,7 @@ import *  as path from "path";
 // import { getConfig } from "../config";
 
 export function libraryPath(str: string): string {
-  return path.join(process.cwd(), str);
+  return path.join('public', str);
 }
 
 export const isDocker = (function (): boolean {

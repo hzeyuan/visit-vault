@@ -3,6 +3,7 @@ import { Context } from 'egg';
 const Jimp = require('jimp')
 import { createWriteStream, ReadStream } from "fs";
 import Image from '../../types/image';
+// import Image from '../../entity/sys/Image';
 import { copyFileAsync, statAsync, unlinkAsync } from '../../utils/fs/async';
 import { libraryPath } from '../../utils/path';
 import { getExtension } from '../../utils/string';
@@ -14,29 +15,37 @@ export = {
       const timeNow = +new Date();
       const actor = { _id: 'a', name: 'actor', aliases: ['actor'], favorite: true, customFields: { _id: 'customFields', name: '' }, availableFields: [{ _id: 'c', name: 't', type: 'STRING' }] } as Actor;
       const label = { _id: 'l', name: 'label', aliases: ['label'] } as Label;
+      const [images, count] = await ctx.service.image.all();
+      const imgs = images.map(img => { img['labels'] = [label]; img.actors = []; return img });
+      ctx.logger.info(`find all ${images}`);
       return {
-        numItems: 1,
-        numPages: 0,
-        items: [
-          {
-            _id: '1',
-            addedOn: 'addedOn',
-            favorite: true,
-            customFields: { _id: 'customFields' },
-            name: '图片',
-            path: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fa0.att.hudong.com%2F52%2F62%2F31300542679117141195629117826.jpg&refer=http%3A%2F%2Fa0.att.hudong.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1611576383&t=63182d5eb71da0dc476244c3a9ceb76e',
-            meta: {
-              dimensions: {
-                height: '300',
-                width: '300',
-              },
-            },
-            actors: [actor],
-            labels: [label],
-          },
-
-        ],
+        numItems: count,
+        numPages: 1,
+        items: imgs as any,
       };
+      // return {
+      //   numItems: 1,
+      //   numPages: 0,
+      //   items: [
+      //     {
+      //       _id: '1',
+      //       addedOn: 'addedOn',
+      //       favorite: true,
+      //       customFields: { _id: 'customFields' },
+      //       name: '图片',
+      //       path: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fa0.att.hudong.com%2F52%2F62%2F31300542679117141195629117826.jpg&refer=http%3A%2F%2Fa0.att.hudong.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1611576383&t=63182d5eb71da0dc476244c3a9ceb76e',
+      //       meta: {
+      //         dimensions: {
+      //           height: '300',
+      //           width: '300',
+      //         },
+      //       },
+      //       actors: [actor],
+      //       labels: [label],
+      //     },
+
+      //   ],
+      // };
     },
   },
   Mutation: {
@@ -130,7 +139,7 @@ export = {
           args.crop.width = Math.round(args.crop.width);
           args.crop.height = Math.round(args.crop.height);
         }
-        
+
         const _image = await Jimp.read(outPath);
         image.hash = _image.hash();
 
@@ -232,7 +241,7 @@ export = {
       // Done
       ctx.logger.info("Creating image:");
       ctx.logger.info(image);
-
+      ctx.service.image.create(image);
       // await imageCollection.upsert(image._id, image);
       // await indexImages([image]);
       await unlinkAsync(outPath);

@@ -30,7 +30,10 @@ export default (appInfo: EggAppInfo) => {
   // 配置静态文件
   config.static = {
     prefix: '/public/',
-    dir: [path.join(appInfo.baseDir, '/assets'), path.join(appInfo.baseDir, 'app/public')],
+    dir: [path.join(appInfo.baseDir, '/assets'),
+    path.join(appInfo.baseDir, '/public'),
+   
+    ],
   };
 
   // 配置数据库

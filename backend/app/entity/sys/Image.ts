@@ -13,27 +13,27 @@ class Image {
   path: string;
   @Column()
   thumbPath: string;
-  @Column()
+  @Column({ nullable: true })
   scene: string;
   @Column()
   addedOn: Date;
   @Column()
   favorite: boolean;
-  @Column()
+  @Column({ nullable: true })
   bookmark: number;
-  @Column()
+  @Column({ default: 0 })
   rating: number;
   @Column()
   customFields: string;
   @Column()
   meta: string;
-  @Column()
+  @Column({ nullable: true })
   actors: string;
-  @Column()
+  @Column({ nullable: true, default: '' })
   studio: string;
   @Column()
   hash: string;
-  @Column()
+  @Column({ nullable: true })
   color: string;
 }
 

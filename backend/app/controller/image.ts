@@ -1,7 +1,6 @@
 import { Controller } from 'egg';
 import * as fs from 'fs';
 import * as path from 'path';
-import Image from '../types/image';
 
 export default class ImageController extends Controller {
   public async image() {
@@ -12,7 +11,7 @@ export default class ImageController extends Controller {
     //     path:'public/flags/ad.svg'
     // } as Image;
     if (image && image.path) {
-      const resolved = path.resolve(image.path);
+      const resolved = path.resolve(`${image.path}`);
       if (!fs.existsSync(resolved)) this.ctx.redirect('/broken');
       else {
 
@@ -29,7 +28,7 @@ export default class ImageController extends Controller {
     //   thumbPath: 'public/flags/ad.svg',
     // } as Image;
     if (image && image.thumbPath) {
-      const resolved = path.resolve(image.thumbPath);
+      const resolved = path.resolve(`${image.thumbPath}`);
       console.log('resolved', resolved);
       console.log(fs.existsSync(resolved));
       if (!fs.existsSync(resolved)) {
