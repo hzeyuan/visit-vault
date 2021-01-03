@@ -8,4 +8,5 @@ export default (app: Application) => {
   router.resources('testResource', '/api/v2/testResource', controller.testResource);
   router.get('/media/image/:image', controller.image.image);
   router.get('/media/image/:image/thumbnail', controller.image.imageThumbnail);
+  router.get('/create',controller.orm.index);
 };

@@ -33,7 +33,8 @@
     "egg-validate": "^2.0.2",
     "jimp": "^0.14.0",
     "sqlite3": "^5.0.0",
-    "ts-node": "^9.1.1"
+    "ts-node": "^9.1.1",
+    "typeorm": "^0.2.29"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "1.19.4",

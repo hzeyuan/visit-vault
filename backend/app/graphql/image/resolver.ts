@@ -11,6 +11,7 @@ export = {
   Query: {
     getImages: async (root, params: QueryGetImagesArgs, ctx: Context): Promise<Query['getImages']> => {
       console.log(ctx, root);
+      const timeNow = +new Date();
       const actor = { _id: 'a', name: 'actor', aliases: ['actor'], favorite: true, customFields: { _id: 'customFields', name: '' }, availableFields: [{ _id: 'c', name: 't', type: 'STRING' }] } as Actor;
       const label = { _id: 'l', name: 'label', aliases: ['label'] } as Label;
       return {

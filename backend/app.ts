@@ -1,4 +1,3 @@
-
 import { Application } from 'egg';
 
 class AppBootHook {

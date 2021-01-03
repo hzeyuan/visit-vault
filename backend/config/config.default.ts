@@ -9,7 +9,7 @@ export default (appInfo: EggAppInfo) => {
 
   config.graphql = graphqlConf;
 
-  config.middleware = [ 'graphql', 'errorHandler' ];
+  config.middleware = ['graphql', 'errorHandler'];
 
   config.security = {
     // domainWhiteList: [ 'http://127.0.0.1:8000' ],
@@ -30,7 +30,7 @@ export default (appInfo: EggAppInfo) => {
   // 配置静态文件
   config.static = {
     prefix: '/public/',
-    dir: [ path.join(appInfo.baseDir, '/assets'), path.join(appInfo.baseDir, 'app/public') ],
+    dir: [path.join(appInfo.baseDir, '/assets'), path.join(appInfo.baseDir, 'app/public')],
   };
 
   // 配置数据库
@@ -39,7 +39,7 @@ export default (appInfo: EggAppInfo) => {
       type: 'sqlite',
       database: path.join(appInfo.baseDir, '/database/test.sqlite'),
       synchronize: true,
-      logging: true,
+      // logging: true,
     },
   };
 
