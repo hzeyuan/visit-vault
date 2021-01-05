@@ -7,16 +7,21 @@ import Image from '../../types/image';
 import { copyFileAsync, statAsync, unlinkAsync } from '../../utils/fs/async';
 import { libraryPath } from '../../utils/path';
 import { getExtension } from '../../utils/string';
+
+
+
+
+
 export = {
 
   Query: {
     getImages: async (root, params: QueryGetImagesArgs, ctx: Context): Promise<Query['getImages']> => {
       console.log(ctx, root);
       const timeNow = +new Date();
+      const [images, count] = await ctx.service.image.all();
       const actor = { _id: 'a', name: 'actor', aliases: ['actor'], favorite: true, customFields: { _id: 'customFields', name: '' }, availableFields: [{ _id: 'c', name: 't', type: 'STRING' }] } as Actor;
       const label = { _id: 'l', name: 'label', aliases: ['label'] } as Label;
-      const [images, count] = await ctx.service.image.all();
-      const imgs = images.map(img => { img['labels'] = [label]; img.actors = []; return img });
+      const imgs = images.map(img => { img['labels'] = [label]; img.actors = [] as any; return img });
       ctx.logger.info(`find all ${images}`);
       return {
         numItems: count,
@@ -70,20 +75,18 @@ export = {
           height: number;
         };
       }, ctx: Context): Promise<Image> => {
-      // for (const actor of args.actors || []) {
-      //   const actorInDb = await Actor.getById(actor);
+      // 查找作者
+      for (const actor of args.actors || []) {
+        const actorInDb = await ctx.service.actor.getById(actor);
+        if (!actorInDb) throw new Error(`Actor ${actor} not found`);
+      }
 
-      //   if (!actorInDb) throw new Error(`Actor ${actor} not found`);
-      // }
-
-      // for (const label of args.labels || []) {
-      //   const labelInDb = await Label.getById(label);
-
-      //   if (!labelInDb) throw new Error(`Label ${label} not found`);
-      // }
+      for (const label of args.labels || []) {
+        const labelInDb = await ctx.service.label.getById(label);
+        if (!labelInDb) throw new Error(`Label ${label} not found`);
+      }
       // if (args.scene) {
       //   const sceneInDb = await Scene.getById(args.scene);
-
       //   if (!sceneInDb) throw new Error(`Scene ${args.scene} not found`);
       // }
       // const config = getConfig();
@@ -185,15 +188,15 @@ export = {
         await copyFileAsync(outPath, sourcePath);
       }
 
-      // let actorIds = [] as string[];
-      // if (args.actors) {
-      //   actorIds = args.actors;
-      // }
+      let actorIds = [] as string[];
+      if (args.actors) {
+        actorIds = args.actors;
+      }
 
-      // let labels = [] as string[];
-      // if (args.labels) {
-      //   labels = args.labels;
-      // }
+      let labels = [] as string[];
+      if (args.labels) {
+        labels = args.labels;
+      }
 
       // if (args.scene) {
       //   const scene = await Scene.getById(args.scene);
@@ -246,6 +249,9 @@ export = {
       // await indexImages([image]);
       await unlinkAsync(outPath);
       ctx.logger.info(`Image '${imageName}' done.`);
+      // 作者和标签，先使用假数据
+      image.actors = [];
+      image['labels'] = [];
       return image
     }
   }
