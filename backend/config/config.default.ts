@@ -6,7 +6,6 @@ export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>;
 
   config.keys = 'v&YOi#*s80QM5pE7UDLCAjy#$BQekY7Q';
-
   config.graphql = graphqlConf;
 
   config.middleware = ['graphql', 'errorHandler'];
@@ -32,7 +31,7 @@ export default (appInfo: EggAppInfo) => {
     prefix: '/public/',
     dir: [path.join(appInfo.baseDir, '/assets'),
     path.join(appInfo.baseDir, '/public'),
-   
+
     ],
   };
 
@@ -45,7 +44,10 @@ export default (appInfo: EggAppInfo) => {
       // logging: true,
     },
   };
-
+  config.logger = {
+    consoleLevel: 'DEBUG',
+    
+  }
   config.onerror = {
     // all(err, ctx) {
     //   // 在此处定义针对所有响应类型的错误处理方法

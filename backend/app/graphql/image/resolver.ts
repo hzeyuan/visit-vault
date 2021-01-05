@@ -3,12 +3,16 @@ import { Context } from 'egg';
 const Jimp = require('jimp')
 import { createWriteStream, ReadStream } from "fs";
 import Image from '../../types/image';
+import { mapAsync } from '../../utils/async';
 // import Image from '../../entity/sys/Image';
 import { copyFileAsync, statAsync, unlinkAsync } from '../../utils/fs/async';
 import { libraryPath } from '../../utils/path';
 import { getExtension } from '../../utils/string';
 
-
+const COLOR_HEX_STRING = /^#[a-f0-9]{6}$/;
+function isHexColorString(str: string) {
+  return COLOR_HEX_STRING.test(str);
+}
 
 
 
@@ -22,7 +26,6 @@ export = {
       const actor = { _id: 'a', name: 'actor', aliases: ['actor'], favorite: true, customFields: { _id: 'customFields', name: '' }, availableFields: [{ _id: 'c', name: 't', type: 'STRING' }] } as Actor;
       const label = { _id: 'l', name: 'label', aliases: ['label'] } as Label;
       const imgs = images.map(img => { img['labels'] = [label]; img.actors = [] as any; return img });
-      ctx.logger.info(`find all ${images}`);
       return {
         numItems: count,
         numPages: 1,
@@ -253,6 +256,102 @@ export = {
       image.actors = [];
       image['labels'] = [];
       return image
+    },
+    updateImages: async (
+      _: unknown,
+      args: MutationUpdateImagesArgs, ctx: Context
+    ): Promise<Image[]> => {
+      // const config = getConfig();
+      const updatedImages = [] as Image[];
+
+      for (const id of args.ids) {
+        const image = await ctx.service.image.getById(id);
+
+        if (image) {
+          const imageLabels: string[] = [];
+          // 设置标签
+          // if (Array.isArray(args.opts.labels)) {
+          //   // If the update sets labels, use those and ignore the existing
+          //   imageLabels.push(...args.opts.labels);
+          // } else {
+          //   const existingLabels = (await Image.getLabels(image)).map((l) => l._id);
+          //   imageLabels.push(...existingLabels);
+          // }
+          // 设置作者
+          // if (Array.isArray(args.opts.actors)) {
+          //   const actorIds = [...new Set(args.opts.actors)];
+          //   await Image.setActors(image, actorIds);
+
+          //   if (
+          //     config.matching.applyActorLabels.includes(
+          //       ApplyActorLabelsEnum.enum["event:image:update"]
+          //     )
+          //   ) {
+          //     const actors = await Actor.getBulk(actorIds);
+          //     const actorLabelIds = (await mapAsync(actors, Actor.getLabels))
+          //       .flat()
+          //       .map((label) => label._id);
+
+          //     logger.log("Applying actor labels to image");
+          //     imageLabels.push(...actorLabelIds);
+          //   }
+          // }
+          // // 保存到数据中
+          //await Image.setLabels(image, imageLabels);
+
+          if (typeof args.opts.bookmark === "number" || args.opts.bookmark === null) {
+            image.bookmark = args.opts.bookmark;
+          }
+
+          if (typeof args.opts.favorite === "boolean") {
+            image.favorite = args.opts.favorite;
+          }
+
+          if (typeof args.opts.name === "string") {
+            image.name = args.opts.name.trim();
+          }
+
+          if (typeof args.opts.rating === "number") {
+            image.rating = args.opts.rating;
+          }
+
+          if (args.opts.studio !== undefined) {
+            image.studio = args.opts.studio;
+          }
+
+          if (args.opts.scene !== undefined) {
+            image.scene = args.opts.scene;
+          }
+
+          if (args.opts.color && isHexColorString(args.opts.color)) {
+            image.color = args.opts.color;
+          }
+
+          if (args.opts.customFields) {
+            for (const key in args.opts.customFields) {
+              const value = args.opts.customFields[key] !== undefined ? args.opts.customFields[key] : null;
+              ctx.logger.info(`Set scene custom.${key} to ${JSON.stringify(value)}`);
+              args.opts.customFields[key] = value;
+            }
+            image.customFields = args.opts.customFields;
+          }
+          await ctx.service.image.create(image);
+          // await imageCollection.upsert(image._id, image);
+          updatedImages.push(image as any);
+        } else {
+          throw new Error(`Image ${id} not found`);
+        }
+      }
+
+      // await indexImages(updatedImages);
+      return updatedImages;
+    },
+    removeImages: async (root, args: MutationRemoveImagesArgs, ctx: Context): Promise<Mutation['removeImages']> => {
+
+      await mapAsync(args.ids, async (id: string) => {
+        await ctx.service.image.remove(id)
+      });
+      return true;
     }
   }
 };

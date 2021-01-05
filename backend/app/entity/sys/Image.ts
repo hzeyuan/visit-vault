@@ -13,28 +13,28 @@ class Image {
   path: string;
   @Column()
   thumbPath: string;
-  @Column({ nullable: true })
-  scene: string;
-  @Column()
-  addedOn: Date;
+  @Column({ type: 'text', nullable: true })
+  scene: string | null;
+  @Column({ type: 'date' })
+  addedOn: number;
   @Column()
   favorite: boolean;
-  @Column({ nullable: true })
-  bookmark: number;
+  @Column({ type: 'text', nullable: true })
+  bookmark: number | null;
   @Column({ default: 0 })
   rating: number;
-  @Column()
-  customFields: string;
+  @Column({ type: 'text' })
+  customFields: Record<string, boolean | string | number | string[] | null> = {};
   @Column()
   meta: string;
-  @Column({ nullable: true })
-  actors: string;
-  @Column({ nullable: true, default: '' })
-  studio: string;
+  @Column({ type: 'text', nullable: true })
+  actors: string | null;
+  @Column({ type: 'text', nullable: true, default: '' })
+  studio: string | null;
   @Column()
   hash: string;
-  @Column({ nullable: true })
-  color: string;
+  @Column({ type: 'text', nullable: true })
+  color: string | null;
 }
 
 

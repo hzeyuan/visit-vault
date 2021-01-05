@@ -1,4 +1,5 @@
 import { Service } from 'egg';
+import { Context } from 'vm';
 import Image from '../entity/sys/Image'
 import TImage from '../types/image';
 export default class ImageService extends Service {
@@ -34,5 +35,9 @@ export default class ImageService extends Service {
   }
   public async all() {
     return await this.ctx.repo.Image.createQueryBuilder('image').getManyAndCount();
+  }
+  public async remove(id: string) {
+
+    return await this.ctx.repo.Image.createQueryBuilder('image').where('image._id = :id', { id }).delete();
   }
 }

@@ -4,7 +4,7 @@ import * as path from 'path';
 
 export default class ImageController extends Controller {
   public async image() {
-    console.log('image', this.ctx.params);
+    // console.log('image', this.ctx.params);
     const image = await this.service.image.getById(this.ctx.params.image);
     // todo :返回一个image对象
     // const image = {
@@ -29,8 +29,7 @@ export default class ImageController extends Controller {
     // } as Image;
     if (image && image.thumbPath) {
       const resolved = path.resolve(`${image.thumbPath}`);
-      console.log('resolved', resolved);
-      console.log(fs.existsSync(resolved));
+      this.logger.debug(`get image ==> ${image.thumbPath}`);
       if (!fs.existsSync(resolved)) {
         this.ctx.redirect('/broken');
       } else {
