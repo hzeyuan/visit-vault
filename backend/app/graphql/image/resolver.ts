@@ -22,7 +22,8 @@ export = {
     getImages: async (root, params: QueryGetImagesArgs, ctx: Context): Promise<Query['getImages']> => {
       console.log(ctx, root);
       const timeNow = +new Date();
-      const [images, count] = await ctx.service.image.all();
+      const images = await ctx.service.image.all();
+      const count = images.length;
       const actor = { _id: 'a', name: 'actor', aliases: ['actor'], favorite: true, customFields: { _id: 'customFields', name: '' }, availableFields: [{ _id: 'c', name: 't', type: 'STRING' }] } as Actor;
       const label = { _id: 'l', name: 'label', aliases: ['label'] } as Label;
       const imgs = images.map(img => { img['labels'] = [label]; img.actors = [] as any; return img });
@@ -342,15 +343,11 @@ export = {
           throw new Error(`Image ${id} not found`);
         }
       }
-
       // await indexImages(updatedImages);
       return updatedImages;
     },
     removeImages: async (root, args: MutationRemoveImagesArgs, ctx: Context): Promise<Mutation['removeImages']> => {
-
-      await mapAsync(args.ids, async (id: string) => {
-        await ctx.service.image.remove(id)
-      });
+      await ctx.service.image.removes(args.ids);
       return true;
     }
   }

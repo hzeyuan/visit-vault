@@ -38,15 +38,19 @@ export default (appInfo: EggAppInfo) => {
   // 配置数据库
   config.typeorm = {
     client: {
-      type: 'sqlite',
-      database: path.join(appInfo.baseDir, '/database/test.sqlite'),
-      synchronize: true,
+      // type: 'sqlite',
+      // database: path.join(appInfo.baseDir, '/database/test.sqlite'),
+      // synchronize: true,
+      type: 'mongodb',
+      host: "localhost",
+      port: 27017,
+      database: "ps"
       // logging: true,
     },
   };
   config.logger = {
     consoleLevel: 'DEBUG',
-    
+
   }
   config.onerror = {
     // all(err, ctx) {

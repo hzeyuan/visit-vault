@@ -1,13 +1,13 @@
 import { Service } from 'egg';
-import { Context } from 'vm';
 import Image from '../entity/sys/Image'
-import TImage from '../types/image';
+import { mapAsync } from '../utils/async';
 export default class ImageService extends Service {
   public async getById(id: string): Promise<Image | undefined> {
-    const image = await this.ctx.repo.Image.createQueryBuilder('image').where('image._id = :id', { id }).getOne();
+    const image = await this.ctx.repo.Image.manager.findOne(Image, { _id: id })
+    // const image = await this.ctx.repo.Image.createQueryBuilder('image').where('image._id = :id', { id }).getOne();
     return image;
   }
-  public async create(image: TImage | Image) {
+  public async create(image: Image){
 
     console.log('create ---')
 
@@ -29,15 +29,28 @@ export default class ImageService extends Service {
     //   hash: '',
     //   color: '',
     // }
-    const res = await this.ctx.repo.Image.createQueryBuilder('image').insert().into(Image)
-      .values(image as Image).execute();
-    this.logger.debug('res', res);
+    
+    const img = await this.ctx.repo.Image.manager.create(Image, image);
+    return this.ctx.repo.Image.manager.save(img);
+    // const res = await this.ctx.repo.Image.createQueryBuilder('image').insert().into(Image)
+    //   .values(image as Image).execute();
   }
   public async all() {
-    return await this.ctx.repo.Image.createQueryBuilder('image').getManyAndCount();
+    return await this.ctx.repo.Image.manager.find(Image);
+    // return await this.ctx.repo.Image.createQueryBuilder('image').getManyAndCount();
+  }
+  public async count() {
+    return await this.ctx.repo.Image.manager.count(Image);
   }
   public async remove(id: string) {
-
-    return await this.ctx.repo.Image.createQueryBuilder('image').where('image._id = :id', { id }).delete();
+    await this.ctx.repo.Image.manager.delete(Image, { _id: id });
+    return true
+    // return await this.ctx.repo.Image.createQueryBuilder('image').where('image._id = :id', { id }).delete();
+  }
+  public async removes(ids: string[]) {
+    await mapAsync(ids, async (id: string) => {
+      await this.ctx.repo.Image.manager.delete(Image, { _id: id });
+      // await this.ctx.repo.Image.createQueryBuilder('image').where('image._id = :id', { id }).delete().execute();
+    });
   }
 }
