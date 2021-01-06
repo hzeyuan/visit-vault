@@ -1,44 +1,63 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ObjectID, ObjectIdColumn } from 'typeorm';
 
+@Entity()
+class IDimensions {
+    @Column({ type: 'number', nullable: true })
+    width: number | null;
+    @Column({ type: 'number', nullable: true })
+    height: number | null;
+}
+
+@Entity()
+class SceneMeta {
+    @Column({ type: 'number', nullable: true })
+    size: number | null;
+    @Column({ type: 'number', nullable: true })
+    duration: number | null;
+    @Column(type => IDimensions)
+    dimensions: IDimensions | null;
+    @Column({ type: 'number', nullable: true })
+    fps: number | null;
+}
 
 @Entity()
 class Scene {
-    @PrimaryGeneratedColumn()
-    id: number;
-    @Column()
+    @ObjectIdColumn()
+    id?: ObjectID;
+    @Column({ unique: true })
     _id: string;
-    @Column({ nullable: true })
-    hash: string
+    @Column({ type: 'string', nullable: true })
+    hash: string | null
     @Column()
     name: string;
-    @Column({ nullable: true })
-    description: string;
-    @Column()
-    addedOn: Date;
-    @Column({ nullable: true })
-    releaseDate: number;
-    @Column({ nullable: true })
-    thumbnail: string;
-    @Column({ nullable: true })
-    preview: string;
+    @Column({ type: 'string', nullable: true })
+    description: string | null;
+    @Column({ type: 'timestamp' })
+    addedOn: number;
+    @Column({ type: 'number', nullable: true })
+    releaseDate: number | null;
+    @Column({ type: 'string', nullable: true })
+    thumbnail: string | null;
+    @Column({ type: 'string', nullable: true })
+    preview: string | null;
     @Column({ default: false })
     favorite: boolean;
-    @Column({ nullable: true })
-    bookmark: number;
+    @Column({ type: 'number', nullable: true })
+    bookmark: number | null;
     @Column({ default: 0 })
     rating: number;
-    @Column({ nullable: true })
-    customFields: string;
-    @Column({ nullable: true })
-    path: string;
-    @Column({ nullable: true })
-    // streamLinks: string[] = [];
-    // @Column({ nullable: true })
-    // watches?: number[]; // backwards compatibility, array of timestamps of watches
-    // @Column({ nullable: true })
-    // meta = new SceneMeta();
-    @Column({ nullable: true })
-    studio: string;
+    @Column({ type: 'json' })
+    customFields: Record<string, boolean | string | number | string[] | null> = {};
+    @Column({ type: 'string', nullable: true })
+    path: string | null;
+    @Column({ type: 'array', default: [] })
+    streamLinks: string[];
+    @Column({ type: 'array' })
+    watches?: number[]; // backwards compatibility, array of timestamps of watches
+    @Column(type => SceneMeta)
+    meta: SceneMeta
+    @Column({ type: 'string', nullable: true })
+    studio: string | null;
     @Column({ default: false })
     processed: boolean
 }

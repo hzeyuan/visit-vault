@@ -1,40 +1,40 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ObjectID, ObjectIdColumn } from 'typeorm';
 
 
 @Entity()
 class Actor {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @ObjectIdColumn()
+    id?: ObjectID;
     @Column()
     _id: string;
     @Column()
     name: string;
-    @Column({ default: '' })
-    aliases: string;
-    @Column()
-    addedOn: Date;
-    @Column({ nullable: true })
-    bornOn: number;
-    @Column({ nullable: true })
-    thumbnail: string
-    @Column({ nullable: true })
-    altThumbnail: string
-    @Column({ nullable: true })
-    hero?: string
+    @Column({ type: 'array', default: [] })
+    aliases: string[];
+    @Column({ type: 'timestamp' })
+    addedOn: number
+    @Column({ type: 'number', nullable: true })
+    bornOn: number | null;
+    @Column({ type: 'number', nullable: true })
+    thumbnail: string | null
+    @Column({ type: 'string', nullable: true })
+    altThumbnail: string | null;
+    @Column({ type: 'string', nullable: true })
+    hero?: string | null;
     @Column({ nullable: true })
     avatar?: string
     @Column({ default: false })
     favorite: boolean;
-    @Column({ nullable: true })
-    bookmark: number
+    @Column({ type: 'string', nullable: true })
+    bookmark: number | null;
     @Column({ default: 0 })
     rating: number
-    @Column()
-    customFields: string;
+    @Column({ type: 'json' })
+    customFields: Record<string, boolean | string | number | string[] | null> = {};
     @Column({ nullable: true })
-    description?: string
+    description?: string | null;
     @Column({ nullable: true })
-    nationality?: string
+    nationality?: string | null;
 }
 
 
