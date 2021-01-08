@@ -1,4 +1,4 @@
-import * as logger from "./logger";
+// import * as logger from "./logger";
 import { isNumber } from "./types";
 
 export function validRating(val: unknown): val is number {
@@ -28,7 +28,7 @@ export function isValidUrl(str: string): boolean {
     new URL(str);
     return true;
   } catch (err) {
-    logger.error(err);
+    // logger.error(err);
     return false;
   }
 }

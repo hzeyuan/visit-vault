@@ -13,11 +13,13 @@ class Label {
     aliases: string[];
     @Column({ type: 'timestamp' })
     addedOn: number
-    @Column({ nullable: true })
-    thumbnail: string | null;
+    @Column({ type: 'string', nullable: true })
+    thumbnail: Image | null;
     @Column({ nullable: true })
     color?: string | null;
 }
+
+
 
 
 export default Label;

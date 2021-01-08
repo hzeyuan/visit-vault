@@ -7,7 +7,7 @@ export default class ImageService extends Service {
     // const image = await this.ctx.repo.Image.createQueryBuilder('image').where('image._id = :id', { id }).getOne();
     return image;
   }
-  public async create(image: Image){
+  public async create(image: Image) {
 
     console.log('create ---')
 
@@ -29,8 +29,8 @@ export default class ImageService extends Service {
     //   hash: '',
     //   color: '',
     // }
-    
-    const img = await this.ctx.repo.Image.manager.create(Image, image);
+
+    const img = this.ctx.repo.Image.manager.create(Image, image);
     return this.ctx.repo.Image.manager.save(img);
     // const res = await this.ctx.repo.Image.createQueryBuilder('image').insert().into(Image)
     //   .values(image as Image).execute();

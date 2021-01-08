@@ -9,6 +9,7 @@ type AutoInstanceType<T, U = T extends CanExportFunc ? T : T extends AnyFunc ? R
 import ExportActor from '../../../app/service/actor';
 import ExportImage from '../../../app/service/image';
 import ExportLabel from '../../../app/service/label';
+import ExportLabelledItem from '../../../app/service/labelledItem';
 import ExportScene from '../../../app/service/scene';
 import ExportTestResource from '../../../app/service/testResource';
 
@@ -17,6 +18,7 @@ declare module 'egg' {
     actor: AutoInstanceType<typeof ExportActor>;
     image: AutoInstanceType<typeof ExportImage>;
     label: AutoInstanceType<typeof ExportLabel>;
+    labelledItem: AutoInstanceType<typeof ExportLabelledItem>;
     scene: AutoInstanceType<typeof ExportScene>;
     testResource: AutoInstanceType<typeof ExportTestResource>;
   }
