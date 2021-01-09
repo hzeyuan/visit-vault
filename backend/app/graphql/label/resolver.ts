@@ -2,7 +2,7 @@ import { Context } from 'egg';
 // import Jimp from "jimp";
 const Jimp = require('jimp')
 import { createWriteStream, ReadStream } from "fs";
-import Label from '../../entity/sys/label';
+import Label from '../../entity/sys/Label';
 import Image from '../../types/image';
 import { mapAsync } from '../../utils/async';
 // import Image from '../../entity/sys/Image';
@@ -54,8 +54,11 @@ export = {
           logger.log(`Updated labels of ${image._id}.`);
         } 
       } */
+
+      
       const label = await ctx.service.label.create({ name: args.name, aliases } as Label);
       // await labelCollection.upsert(label._id, label);
+      // return label;
       return label;
     }
   }

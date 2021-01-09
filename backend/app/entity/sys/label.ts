@@ -1,11 +1,12 @@
 import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ObjectID, ObjectIdColumn } from 'typeorm';
+import { generateHash } from '../../utils/hash';
 
 
 @Entity()
 class Label {
+    // @ObjectIdColumn()
+    // id?: ObjectID;
     @ObjectIdColumn()
-    id?: ObjectID;
-    @Column({ unique: true })
     _id: string;
     @Column()
     name: string;

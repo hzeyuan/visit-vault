@@ -3,25 +3,25 @@
 
 import 'egg';
 import { TreeRepository, Repository } from 'typeorm'
+import SysActor from '../app/entity/sys/Actor'
 import SysImage from '../app/entity/sys/Image'
-import SysActor from '../app/entity/sys/actor'
-import SysLabel from '../app/entity/sys/label'
-import SysLabelledItem from '../app/entity/sys/labelledItem'
-import SysScene from '../app/entity/sys/scene'
+import SysLabel from '../app/entity/sys/Label'
+import SysLabelledItem from '../app/entity/sys/LabelledItem'
+import SysScene from '../app/entity/sys/Scene'
 
 declare module 'egg' {
   interface Context {
     entity: {
-      Image: typeof SysImage
       Actor: typeof SysActor
+      Image: typeof SysImage
       Label: typeof SysLabel
       LabelledItem: typeof SysLabelledItem
       Scene: typeof SysScene
       test: {}
     }
     repo: {
-      Image: Repository<SysImage>
       Actor: Repository<SysActor>
+      Image: Repository<SysImage>
       Label: Repository<SysLabel>
       LabelledItem: Repository<SysLabelledItem>
       Scene: Repository<SysScene>

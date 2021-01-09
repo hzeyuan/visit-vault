@@ -19,8 +19,6 @@ class ImageMeta {
 @Entity()
 class Image {
   @ObjectIdColumn()
-  id?: ObjectID;
-  @Column({ unique: true })
   _id: string;
   @Column()
   name: string;

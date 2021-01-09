@@ -1,11 +1,17 @@
 import { Service } from 'egg';
 import Label from '../entity/sys/Label'
-import LabelledItem from '../entity/sys/labelledItem';
+import LabelledItem from '../entity/sys/LabelledItem';
+import { generateHash } from '../utils/hash';
 import { arrayDiff } from '../utils/misc';
 export default class LabelService extends Service {
+    public async getById(id: string): Promise<Label | undefined> {
+        const label = await this.ctx.repo.Label.manager.findOne(Label, { _id: id })
+        return label;
+    }
     public async create(_label: Label | undefined) {
-        const label = await this.ctx.repo.Label.manager.create(Label, _label);
-        return this.ctx.repo.Label.manager.save(label);
+        const _id = `la_${generateHash()}`;
+        const label = this.ctx.repo.Label.manager.create(Label, { ..._label, _id });
+        return await this.ctx.repo.Label.manager.save(label);
     }
     public async all(): Promise<Label[]> {
         return await this.ctx.repo.Label.manager.find(Label);
