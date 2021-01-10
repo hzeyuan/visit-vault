@@ -22,9 +22,7 @@ class SceneMeta {
 
 @Entity()
 class Scene {
-    @ObjectIdColumn()
-    id?: ObjectID;
-    @Column({ unique: true })
+    @ObjectIdColumn({ type: "string", generated: true })
     _id: string;
     @Column({ type: 'string', nullable: true })
     hash: string | null

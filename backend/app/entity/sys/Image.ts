@@ -18,7 +18,7 @@ class ImageMeta {
 
 @Entity()
 class Image {
-  @ObjectIdColumn()
+  @ObjectIdColumn({ type: "string", generated: true })
   _id: string;
   @Column()
   name: string;

@@ -4,9 +4,7 @@ import { generateHash } from '../../utils/hash';
 
 @Entity()
 class Label {
-    // @ObjectIdColumn()
-    // id?: ObjectID;
-    @ObjectIdColumn()
+    @ObjectIdColumn({ type: "string", generated: true })
     _id: string;
     @Column()
     name: string;

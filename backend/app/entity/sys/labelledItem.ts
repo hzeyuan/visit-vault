@@ -5,8 +5,6 @@ import { generateHash } from '../../utils/hash';
 @Entity()
 class LabelledItem {
     @ObjectIdColumn()
-    id?: ObjectID;
-    @Column({ default:`li_${generateHash()}`,unique: true })
     _id?: string;
     @Column()
     label: string;

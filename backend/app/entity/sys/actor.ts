@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ObjectID, Object
 
 @Entity()
 class Actor {
-    @ObjectIdColumn()
+    @ObjectIdColumn({ type: "string", generated: true })
     id?: ObjectID;
     @Column()
     _id: string;

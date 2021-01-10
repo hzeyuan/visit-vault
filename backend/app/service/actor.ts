@@ -3,10 +3,10 @@ import Actor from '../entity/sys/Actor'
 import { mapAsync } from '../utils/async';
 export default class ActorService extends Service {
   public async getById(id: string): Promise<Actor | undefined> {
-    const actor = await this.ctx.repo.Actor.manager.findOne(Actor, { _id: id })
+    const actor = await this.ctx.repo.Actor.manager.findOne(Actor, id)
     return actor;
   }
-  public async create(_actor: Actor){
+  public async create(_actor: Actor) {
     console.log('create ---')
     const actor = await this.ctx.repo.Actor.manager.create(Actor, _actor);
     return this.ctx.repo.Actor.manager.save(actor);
