@@ -2,9 +2,10 @@ import { Context } from 'egg';
 // import Jimp from "jimp";
 const Jimp = require('jimp')
 import { createWriteStream, ReadStream } from "fs";
-import Image from '../../types/image';
-import { mapAsync } from '../../utils/async';
-// import Image from '../../entity/sys/Image';
+import { ObjectID } from 'mongodb';
+// import Image from '../../types/image';
+import Image from '../../entity/sys/Image';
+import { ImageMeta } from '../../types/image';
 import { copyFileAsync, statAsync, unlinkAsync } from '../../utils/fs/async';
 import { libraryPath } from '../../utils/path';
 import { getExtension } from '../../utils/string';
@@ -108,7 +109,8 @@ export = {
       if (!mimetype.includes("image/")) {
         throw new Error("Invalid file");
       }
-      const image = new Image(imageName);
+      const _id = new ObjectID().toString();
+      const image = ctx.repo.Image.manager.create(Image, { _id, name: imageName, meta: new ImageMeta(), favorite: false });
 
       const outPath = `/tmp/${image._id}${ext}`;
       ctx.logger.info(`Getting file...`);
@@ -248,7 +250,7 @@ export = {
       // Done
       ctx.logger.info("Creating image:");
       ctx.logger.info(image);
-      ctx.service.image.create(image);
+      await ctx.service.image.create(image);
       // await imageCollection.upsert(image._id, image);
       // await indexImages([image]);
       await unlinkAsync(outPath);

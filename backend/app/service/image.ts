@@ -31,7 +31,7 @@ export default class ImageService extends Service {
     // }
 
     const img = this.ctx.repo.Image.manager.create(Image, image);
-    return this.ctx.repo.Image.manager.save(img);
+    return await this.ctx.repo.Image.manager.save(img);
     // const res = await this.ctx.repo.Image.createQueryBuilder('image').insert().into(Image)
     //   .values(image as Image).execute();
   }

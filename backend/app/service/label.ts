@@ -1,8 +1,6 @@
 import { Service } from 'egg';
-import { RFC_2822 } from 'moment';
 import Label from '../entity/sys/Label'
 import LabelledItem from '../entity/sys/LabelledItem';
-import { generateHash } from '../utils/hash';
 import { arrayDiff } from '../utils/misc';
 export default class LabelService extends Service {
     public async getById(id: string): Promise<Label | undefined> {

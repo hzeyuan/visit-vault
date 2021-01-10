@@ -30,7 +30,7 @@ class Image {
   scene: string | null;
   @Column({ type: 'timestamp' })
   addedOn: number;
-  @Column()
+  @Column({ default: false })
   favorite: boolean;
   @Column({ type: 'text', nullable: true })
   bookmark: number | null;
