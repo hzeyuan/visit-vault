@@ -4,12 +4,10 @@ import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ObjectID, Object
 @Entity()
 class Actor {
     @ObjectIdColumn({ type: "string", generated: true })
-    id?: ObjectID;
-    @Column()
     _id: string;
     @Column()
     name: string;
-    @Column({ type: 'array', default: [] })
+    @Column({ type: 'array', default: [], generated: true })
     aliases: string[];
     @Column({ type: 'timestamp' })
     addedOn: number
@@ -23,13 +21,13 @@ class Actor {
     hero?: string | null;
     @Column({ nullable: true })
     avatar?: string
-    @Column({ default: false })
+    @Column({ default: false, generated: true })
     favorite: boolean;
     @Column({ type: 'string', nullable: true })
     bookmark: number | null;
-    @Column({ default: 0 })
+    @Column({ default: 0, generated: true })
     rating: number
-    @Column({ type: 'json' })
+    @Column({ type: 'json', default: {}, generated: true })
     customFields: Record<string, boolean | string | number | string[] | null> = {};
     @Column({ nullable: true })
     description?: string | null;
