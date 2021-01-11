@@ -1,9 +1,7 @@
 import { Context } from 'egg';
-// import Jimp from "jimp";
 const Jimp = require('jimp')
 import { createWriteStream, ReadStream } from "fs";
 import { ObjectID } from 'mongodb';
-// import Image from '../../types/image';
 import Image from '../../entity/sys/Image';
 import { ImageMeta } from '../../types/image';
 import { copyFileAsync, statAsync, unlinkAsync } from '../../utils/fs/async';
@@ -90,10 +88,10 @@ export = {
         const labelInDb = await ctx.service.label.getById(label);
         if (!labelInDb) throw new Error(`Label ${label} not found`);
       }
-      // if (args.scene) {
-      //   const sceneInDb = await Scene.getById(args.scene);
-      //   if (!sceneInDb) throw new Error(`Scene ${args.scene} not found`);
-      // }
+      if (args.scene) {
+        const sceneInDb = await ctx.service.scene.getById(args.scene);
+        if (!sceneInDb) throw new Error(`Scene ${args.scene} not found`);
+      }
       // const config = getConfig();
       const { filename, mimetype, createReadStream } = await args.file;
       const ext = getExtension(filename); // 文件后缀
@@ -204,18 +202,18 @@ export = {
         labels = args.labels;
       }
 
-      // if (args.scene) {
-      //   const scene = await Scene.getById(args.scene);
+      if (args.scene) {
+        const scene = await ctx.service.scene.getById(args.scene);
 
-      //   if (scene) {
-      //     image.scene = args.scene;
+        // if (scene) {
+        //   image.scene = args.scene;
 
-      //     const sceneActors = (await Scene.getActors(scene)).map((a) => a._id);
-      //     actorIds.push(...sceneActors);
-      //     const sceneLabels = (await Scene.getLabels(scene)).map((a) => a._id);
-      //     labels.push(...sceneLabels);
-      //   }
-      // }
+        //   const sceneActors = (await Scene.getActors(scene)).map((a) => a._id);
+        //   actorIds.push(...sceneActors);
+        //   const sceneLabels = (await Scene.getLabels(scene)).map((a) => a._id);
+        //   labels.push(...sceneLabels);
+        // }
+      }
 
       // if (args.studio) {
       //   const studio = await Studio.getById(args.studio);

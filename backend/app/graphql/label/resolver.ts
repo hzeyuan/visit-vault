@@ -93,9 +93,21 @@ export = {
 
       return updatedLabels;
     },
-  },
-  // removeLabels: async (root, args: MutationRemoveLabelsArgs, ctx: Context): Promise<Mutation<['removeLabels']> => {
+    removeLabels: async (root, args: MutationRemoveLabelsArgs, ctx: Context): Promise<Mutation['removeLabels']> => {
+      const { ids } = args;
+      for (const id of ids) {
+        // const label = await ctx.service.label.getById(id);
+        await ctx.service.label.remove(id);
 
-  // }
+        // await Label.remove(label._id);
+        // await ctx.service.labelledItem.removeByLabel(id);
+        // await LabelledItem.removeByLabel(id);
+        // if (label) {
+        // }
+      }
+      return true;
+    }
+  },
+
 };
 

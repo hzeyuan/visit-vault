@@ -39,4 +39,7 @@ export default class LabelService extends Service {
         const references = await this.service.labelledItem.getByItem(id);
         return await this.service.getBulk(references.map((r) => r.label));
     }
+    public async remove(id: string) {
+        return await this.ctx.repo.Label.manager.delete(Label, { id });
+    }
 }

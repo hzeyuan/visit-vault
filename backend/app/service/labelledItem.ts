@@ -20,5 +20,7 @@ export default class LabelItemService extends Service {
     public async getByType(type: string): Promise<LabelledItem[]> {
         return await this.ctx.repo.LabelledItem.manager.find(LabelledItem, { type })
     }
+    public async removeByLabel(id: string) {
 
+    }
 }
