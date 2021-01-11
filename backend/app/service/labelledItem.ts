@@ -4,7 +4,6 @@ import { generateHash } from '../utils/hash';
 export default class LabelItemService extends Service {
 
     public async create(_labelledItem: LabelledItem | undefined) {
-        // const _id = `li_${generateHash()}`
         const labelledItem = await this.ctx.repo.LabelledItem.manager.create(LabelledItem, { ..._labelledItem });
         return this.ctx.repo.LabelledItem.manager.save(labelledItem);
     }

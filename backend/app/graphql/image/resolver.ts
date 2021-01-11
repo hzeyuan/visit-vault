@@ -205,14 +205,14 @@ export = {
       if (args.scene) {
         const scene = await ctx.service.scene.getById(args.scene);
 
-        // if (scene) {
-        //   image.scene = args.scene;
+        if (scene) {
+          image.scene = args.scene;
 
-        //   const sceneActors = (await Scene.getActors(scene)).map((a) => a._id);
-        //   actorIds.push(...sceneActors);
-        //   const sceneLabels = (await Scene.getLabels(scene)).map((a) => a._id);
-        //   labels.push(...sceneLabels);
-        // }
+          const sceneActors = (await ctx.service.scene.getActors(scene)).map((a) => a._id);
+          actorIds.push(...sceneActors);
+          const sceneLabels = (await ctx.service.scene.getLabels(scene)).map((a) => a._id);
+          labels.push(...sceneLabels);
+        }
       }
 
       // if (args.studio) {
@@ -275,7 +275,7 @@ export = {
           //   // If the update sets labels, use those and ignore the existing
           //   imageLabels.push(...args.opts.labels);
           // } else {
-          //   const existingLabels = (await Image.getLabels(image)).map((l) => l._id);
+          //   const existingLabels = (await ctx.service.image.getLabels(image)).map((l) => l._id);
           //   imageLabels.push(...existingLabels);
           // }
           // 设置作者

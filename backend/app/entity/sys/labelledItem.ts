@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ObjectID, ObjectIdColumn } from 'typeorm';
-import { generateHash } from '../../utils/hash';
+import { Entity,  Column, ObjectIdColumn } from 'typeorm';
 
 
 @Entity()

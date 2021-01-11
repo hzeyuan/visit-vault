@@ -1,15 +1,9 @@
 import { Context } from 'egg';
-// import Jimp from "jimp";
 const Jimp = require('jimp')
-import { createWriteStream, ReadStream } from "fs";
 import Label from '../../entity/sys/Label';
-import Image from '../../types/image';
-import { mapAsync } from '../../utils/async';
 // import Image from '../../entity/sys/Image';
-import { copyFileAsync, statAsync, unlinkAsync } from '../../utils/fs/async';
 import { filterInvalidAliases } from '../../utils/misc';
-import { libraryPath } from '../../utils/path';
-import { getExtension, isHexColor } from '../../utils/string';
+import { isHexColor } from '../../utils/string';
 
 const COLOR_HEX_STRING = /^#[a-f0-9]{6}$/;
 function isHexColorString(str: string) {

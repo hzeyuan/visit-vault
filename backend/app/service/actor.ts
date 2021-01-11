@@ -11,7 +11,7 @@ export default class ActorService extends Service {
     const actor = await this.ctx.repo.Actor.manager.create(Actor, _actor);
     return this.ctx.repo.Actor.manager.save(actor);
   }
-  public async all() {
+  public async all(): Promise<Actor[]> {
     return await this.ctx.repo.Actor.manager.find(Actor);
   }
   public async count() {
@@ -26,4 +26,5 @@ export default class ActorService extends Service {
       await this.ctx.repo.Actor.manager.delete(Actor, { _id: id });
     });
   }
+
 }
