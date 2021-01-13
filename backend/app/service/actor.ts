@@ -1,10 +1,13 @@
 import { Service } from 'egg';
 import Actor from '../entity/sys/Actor'
+import ActorReference from '../entity/sys/ActorReference';
+import { isValidCountryCode } from '../types/countries';
 import { mapAsync } from '../utils/async';
+import { arrayDiff, filterInvalidAliases, validRating } from '../utils/misc';
 export default class ActorService extends Service {
-  public async getById(id: string): Promise<Actor | undefined> {
+  public async getById(id: string): Promise<Maybe<Actor>> {
     const actor = await this.ctx.repo.Actor.manager.findOne(Actor, id)
-    return actor;
+    return typeof actor !== 'undefined' ? actor : null;
   }
   public async create(_actor: Actor) {
     const actor = await this.ctx.repo.Actor.manager.create(Actor, _actor);
@@ -26,17 +29,33 @@ export default class ActorService extends Service {
     });
   }
   public async getLabels(actor: Actor): Promise<Label[]> {
-    return [];
+    return await this.ctx.service.label.getForItem(actor._id);
   }
-  public async setLabels(actor: Actor, labels: string[]) {
+  public async setForItem(itemId: string, actorIds: string[], type: string): Promise<void> {
+    const oldRefs = await this.service.actorReference.getByItem(itemId);
+    const { removed, added } = arrayDiff(oldRefs, [...new Set(actorIds)], "actor", (l) => l);
+    for (const oldRef of removed) {
+      await this.ctx.repo.Image.manager.delete(ActorReference, { _id: oldRef._id });
+      // await actorReferenceCollection.remove(oldRef._id);
+    }
+    for (const id of added) {
+      // const actorRef = new ActorReference(itemId, id, type);
+      const actorRef = await this.ctx.service.actorReference.create({ item: itemId, _id: id, type });
+      this.logger.debug(`Adding actor to ${type}: ${JSON.stringify(actorRef)}`);
 
+      // await actorReferenceCollection.upsert(actorRef._id, actorRef);
+    }
   }
-  // public async onActorCreate(actor: Actor, labels: string[], event: "actorCreated" | "actorCustom" = "actorCreated") {
+  public async setLabels(actor: Actor, labelIds: string[]) {
+    return this.setForItem(actor._id, labelIds, "actor");
+  }
+  // public async onActorCreate(actor: Actor, labels: string[], event: "actorCreated" | "actorCustom" = "actorCreated"): Promise<Actor> {
+  //   const config = getConfig();
   //   const createdImages = [] as Image[];
-  //   const pluginResult = await runPluginsSerial(config, event, {
+  //   const pluginResult = await this.ctx.service.plugin.runPluginsSerial(config, event, {
   //     actor: JSON.parse(JSON.stringify(actor)) as Actor,
   //     actorName: actor.name,
-  //     countries: JSON.parse(JSON.stringify(countries)) as ICountry[],
+  //     // countries: JSON.parse(JSON.stringify(countries)) as ICountry[],
   //     $createLocalImage: async (path: string, name: string, thumbnail?: boolean) => {
   //       const img = await createLocalImage(path, name, thumbnail);
   //       await Image.addActors(img, [actor._id]);
@@ -149,13 +168,13 @@ export default class ActorService extends Service {
   //       const extractedIds = localExtractLabels(labelName);
   //       if (extractedIds.length) {
   //         labelIds.push(...extractedIds);
-  //         logger.log(`Found ${extractedIds.length} labels for ${<string>labelName}:`);
-  //         logger.log(extractedIds);
+  //         this.ctx.logger.info(`Found ${extractedIds.length} labels for ${<string>labelName}:`);
+  //         this.ctx.logger.info(extractedIds);
   //       } else if (config.plugins.createMissingLabels) {
   //         const label = new Label(labelName);
   //         labelIds.push(label._id);
   //         await labelCollection.upsert(label._id, label);
-  //         logger.log(`Created label ${label.name}`);
+  //         this.ctx.logger.info(`Created label ${label.name}`);
   //       }
   //     }
   //     actorLabels.push(...labelIds);
@@ -170,12 +189,69 @@ export default class ActorService extends Service {
   //       (event === "actorCustom" &&
   //         config.matching.applyActorLabels.includes(ApplyActorLabelsEnum.enum["plugin:actor:custom"]))
   //     ) {
-  //       await Image.setLabels(image, actorLabels);
+  //       await this.ctx.service.image.setLabels(image, actorLabels);
   //     }
-  //     await indexImages([image]);
+  //     // await indexImages([image]);
   //   }
 
   //   return actor;
   // }
+  // public async findUnmatchedScenes(actor: Actor, actorLabels?: string[]): Promise<void> {
+  //   const config = getConfig();
+  //   // Prevent looping on scenes if we know it'll never be matched
+  //   if (
+  //     config.matching.matcher.options.ignoreSingleNames &&
+  //     !ignoreSingleNames([actor.name]).length
+  //   ) {
+  //     return;
+  //   }
 
+  //   const res = await searchUnmatchedItem(actor, "actors");
+  //   if (!res.items.length) {
+  //     logger.log(`No unmatched scenes to attach "${actor.name}" to`);
+  //     return;
+  //   }
+
+  //   const localExtractActors = await buildActorExtractor([actor]);
+  //   const matchedScenes: Scene[] = [];
+
+  //   logger.log(`Attaching actor "${actor.name}" labels to ${res.items.length} potential scenes`);
+  //   let sceneIterationCount = 0;
+  //   const loader = ora(
+  //     `Attaching actor "${actor.name}" to unmatched scenes. Checking scenes: ${sceneIterationCount}/${res.items.length}`
+  //   ).start();
+
+  //   for (const scene of await Scene.getBulk(res.items)) {
+  //     sceneIterationCount++;
+  //     loader.text = `Attaching actor "${actor.name}" to unmatched scenes. Checking scenes: ${sceneIterationCount}/${res.items.length}`;
+  //     if (localExtractActors(scene.path || scene.name).includes(actor._id)) {
+  //       logger.log(`Found scene "${scene.name}"`);
+  //       matchedScenes.push(scene);
+
+  //       if (actorLabels?.length) {
+  //         await Scene.addLabels(scene, actorLabels);
+  //       }
+
+  //       await Scene.addActors(scene, [actor._id]);
+  //     }
+  //   }
+
+  //   loader.succeed(
+  //     `Attached actor "${actor.name}" to ${matchedScenes.length} scenes out of ${res.items.length} potential matches`
+  //   );
+
+  //   try {
+  //     await indexScenes(matchedScenes);
+  //   } catch (error) {
+  //     logger.error(error);
+  //   }
+  //   logger.log(
+  //     `Added actor "${actor.name}" ${actorLabels?.length ? "with" : "without"
+  //     } labels to scenes : ${JSON.stringify(
+  //       matchedScenes.map((s) => s._id),
+  //       null,
+  //       2
+  //     )}`
+  //   );
+  // }
 }

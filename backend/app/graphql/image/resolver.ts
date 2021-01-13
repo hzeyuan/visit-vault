@@ -271,13 +271,13 @@ export = {
         if (image) {
           const imageLabels: string[] = [];
           // 设置标签
-          // if (Array.isArray(args.opts.labels)) {
-          //   // If the update sets labels, use those and ignore the existing
-          //   imageLabels.push(...args.opts.labels);
-          // } else {
-          //   const existingLabels = (await ctx.service.image.getLabels(image)).map((l) => l._id);
-          //   imageLabels.push(...existingLabels);
-          // }
+          if (Array.isArray(args.opts.labels)) {
+            // If the update sets labels, use those and ignore the existing
+            imageLabels.push(...args.opts.labels);
+          } else {
+            const existingLabels = (await ctx.service.image.getLabels(image)).map((l) => l._id);
+            imageLabels.push(...existingLabels);
+          }
           // 设置作者
           // if (Array.isArray(args.opts.actors)) {
           //   const actorIds = [...new Set(args.opts.actors)];
@@ -297,9 +297,11 @@ export = {
           //     imageLabels.push(...actorLabelIds);
           //   }
           // }
-          // // 保存到数据中
-          //await Image.setLabels(image, imageLabels);
 
+          // // 保存到数据中
+          await ctx.service.image.setLabels(image, imageLabels);
+          // 这里先暂时设置labels的返回
+          image['labels'] = [];
           if (typeof args.opts.bookmark === "number" || args.opts.bookmark === null) {
             image.bookmark = args.opts.bookmark;
           }
@@ -336,6 +338,7 @@ export = {
             }
             image.customFields = args.opts.customFields;
           }
+
           await ctx.service.image.create(image);
           // await imageCollection.upsert(image._id, image);
           updatedImages.push(image as any);

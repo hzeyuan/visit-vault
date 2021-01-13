@@ -53,4 +53,20 @@ export default class ImageService extends Service {
       // await this.ctx.repo.Image.createQueryBuilder('image').where('image._id = :id', { id }).delete().execute();
     });
   }
+  public async insert(_image: Image) {
+    return await this.ctx.repo.Image.manager.insert(Image, _image);
+  }
+  public async update(id: string, _image: Image) {
+
+    return await this.ctx.repo.Image.manager.update(Image, id, _image);
+  }
+  public async upsert(_image: Image) {
+
+  }
+  public async getLabels(image: Image): Promise<Label[]> {
+    return this.service.label.getForItem(image._id);
+  }
+  public async setLabels(image: Image, labelIds: string[]): Promise<void> {
+    return await this.service.label.setForItem(image._id, labelIds, "image");
+  }
 }

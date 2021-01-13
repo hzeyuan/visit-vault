@@ -11,6 +11,7 @@ import ExportActor from '../../../app/service/actor';
 import ExportImage from '../../../app/service/image';
 import ExportLabel from '../../../app/service/label';
 import ExportLabelledItem from '../../../app/service/labelledItem';
+import ExportPlugin from '../../../app/service/plugin';
 import ExportScene from '../../../app/service/scene';
 import ExportTestResource from '../../../app/service/testResource';
 
@@ -21,6 +22,7 @@ declare module 'egg' {
     image: AutoInstanceType<typeof ExportImage>;
     label: AutoInstanceType<typeof ExportLabel>;
     labelledItem: AutoInstanceType<typeof ExportLabelledItem>;
+    plugin: AutoInstanceType<typeof ExportPlugin>;
     scene: AutoInstanceType<typeof ExportScene>;
     testResource: AutoInstanceType<typeof ExportTestResource>;
   }

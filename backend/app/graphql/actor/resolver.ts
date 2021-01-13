@@ -1,5 +1,6 @@
 import { Context } from 'egg';
 import Actor from '../../entity/sys/Actor';
+import { mapAsync } from '../../utils/async';
 // import { isValidCountryCode } from '../../types/countries';
 import { filterInvalidAliases, isArrayEq } from '../../utils/misc';
 
@@ -14,15 +15,95 @@ export = {
       | undefined> => {
       console.log(ctx, root);
       const timeNow = +new Date();
+      // const query = () => {
+      //   if (options.query && options.query.length) {
+      //     return [
+      //       {
+      //         multi_match: {
+      //           query: options.query || "",
+      //           fields: ["name^1.5", "labelNames", "nationalityName^0.75"],
+      //           fuzziness: "AUTO",
+      //         },
+      //       },
+      //     ];
+      //   }
+      //   return [];
+      // };
 
+      // const nationality = () => {
+      //   if (options.nationality) {
+      //     return [
+      //       {
+      //         term: {
+      //           countryCode: options.nationality,
+      //         },
+      //       },
+      //     ];
+      //   }
+      //   return [];
+      // };
+      // const result = await getClient().search<IActorSearchDoc>({
+      //   index: indexMap.actors,
+      //   ...getPage(options.page, options.skip, options.take),
+      //   body: {
+      //     ...sort(options.sortBy, options.sortDir, options.query),
+      //     track_total_hits: true,
+      //     query: {
+      //       bool: {
+      //         must: shuffle(shuffleSeed, options.sortBy, query().filter(Boolean)),
+      //         filter: [
+      //           ratingFilter(options.rating),
+      //           ...bookmark(options.bookmark),
+      //           ...favorite(options.favorite),
+
+      //           ...includeFilter(options.include),
+      //           ...excludeFilter(options.exclude),
+
+      //           ...arrayFilter(options.studios, "studios", "OR"),
+
+      //           ...nationality(),
+
+      //           ...extraFilter,
+      //         ],
+      //       },
+      //     },
+      //   },
+      // });
       let actors = await ctx.service.actor.all();
-      const count = actors.length;
-      actors = actors.map(actor => { actor['availableFields'] = {}; actor['getCustomFields'] = {}; return actor });
+      const total = actors.length;
+      if (total === 0) {
+        ctx.logger.info(`No items in ES, returning 0`);
+        return {
+          items: [],
+          numPages: 0,
+          numItems: 0,
+        };
+      }
+      // 给actor设置标签
+      await mapAsync(actors, async (actor) => {
+        const labels = await ctx.service.actor.getLabels(actor)
+        console.log('labels', labels);
+        if (labels) {
+          actor['labels'] = labels;
+        }
+        return actor
+      })
+
       return {
-        numItems: count,
-        numPages: 1,
+        numItems: total,
+        numPages: Math.ceil(total / 20),
         items: actors,
       };
+    },
+    getActorById: async (root, params: QueryGetActorByIdArgs, ctx: Context): Promise<Actor | null> => {
+      const actor = await ctx.service.actor.getById(params.id);
+      if (!actor) return null;
+      actor['numScenes'] = 0
+      actor.customFields = {};
+      actor['collabs'] = [];
+      actor['labels'] = []
+      return actor;
+
     },
   },
   Mutation: {
@@ -38,15 +119,15 @@ export = {
         actorLabels = args.labels;
       }
 
+      // 插件相关设置
       // try {
-      //   actor = await ctx.service.actor.onActorCreate(actor, actorLabels);
+      //   let a  = await ctx.service.actor.onActorCreate(actor, actorLabels);
       // } catch (error) {
       //   logger.error(error);
       // }
-
+      // 给lactor设置label
       await ctx.service.actor.setLabels(actor, actorLabels);
       // await actorCollection.upsert(actor._id, actor);
-
       // await Actor.findUnmatchedScenes(
       //   actor,
       //   config.matching.applyActorLabels.includes(ApplyActorLabelsEnum.enum["event:actor:create"])
@@ -169,7 +250,6 @@ export = {
 
     },
     runActorPlugins: async () => {
-
     },
     attachActorToUnmatchedScenes: async () => {
 

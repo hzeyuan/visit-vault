@@ -3,8 +3,8 @@ import { Entity,  Column, ObjectIdColumn } from 'typeorm';
 
 @Entity()
 class LabelledItem {
-    @ObjectIdColumn()
-    _id?: string;
+    @ObjectIdColumn({ type: "string", generated: true })
+    _id: string;
     @Column()
     label: string;
     @Column()

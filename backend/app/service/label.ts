@@ -26,20 +26,39 @@ export default class LabelService extends Service {
         const oldRefs = await this.service.LabelledItem.getByItem(itemId);
         const { added } = arrayDiff(oldRefs, [...new Set(labelIds)], "label", (l) => l);
         for (const id of added) {
-            const labelledItem: LabelledItem = {
+            const labelledItem = {
                 item: itemId,
                 label: id,
                 type
-            };
+            } as LabelledItem;
             this.ctx.logger.info(`Adding label: ${JSON.stringify(labelledItem)}`);
             await this.service.labelledItem.create(labelledItem);
         }
     }
     public async getForItem(id: string): Promise<Label[]> {
         const references = await this.service.labelledItem.getByItem(id);
-        return await this.service.getBulk(references.map((r) => r.label));
+        return await this.service.label.getBulk(references.map((r) => r.label));
     }
     public async remove(id: string) {
         return await this.ctx.repo.Label.manager.delete(Label, { id });
+    }
+    public async setForItem(itemId: string, labelIds: string[], type: string): Promise<void> {
+        const oldRefs = await this.service.labelledItem.getByItem(itemId);
+
+        const { removed, added } = arrayDiff(oldRefs, [...new Set(labelIds)], "label", (l) => l);
+        const oldRefIds = removed.map(oldRef => oldRef._id);
+        await this.service.labelledItem.removes(oldRefIds);
+        // for (const oldRef of removed) {
+        //     this.service.labelledItem.remove();
+        //     await labelledItemCollection.remove(oldRef._id);
+        // }
+        const labelledItems = added.map(id => this.ctx.repo.LabelledItem.manager.create(LabelledItem, { item: itemId, type }));
+        await this.service.labelledItem.insert(labelledItems);
+        // for (const id of added) {
+        //     // const labelledItem = new LabelledItem(itemId, id, type);
+        //     const labelledItem = this.ctx.repo.LabelledItem.manager.create(LabelledItem, { ..._labelledItem });
+        //     this.ctx.logger.info(`Adding label: ${JSON.stringify(labelledItem)}`);
+        //     await labelledItemCollection.upsert(labelledItem._id, labelledItem);
+        // }
     }
 }
