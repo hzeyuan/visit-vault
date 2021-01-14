@@ -1,5 +1,6 @@
 import { Service } from 'egg';
-import Label from '../entity/sys/Label'
+import Label from '../entity/sys/Label';
+import { ObjectID } from 'mongodb';
 import LabelledItem from '../entity/sys/LabelledItem';
 import { arrayDiff } from '../utils/misc';
 export default class LabelService extends Service {
@@ -20,7 +21,8 @@ export default class LabelService extends Service {
         return await this.ctx.repo.Label.manager.find(Label);
     }
     public async getBulk(_ids: string[]): Promise<Label[]> {
-        return await this.ctx.repo.Label.findByIds(_ids);
+        const ids = _ids.map(id => new ObjectID(id));
+        return await this.ctx.repo.Label.findByIds(ids);
     }
     public async addForItem(itemId: string, labelIds: string[], type: string): Promise<void> {
         const oldRefs = await this.service.LabelledItem.getByItem(itemId);
@@ -52,7 +54,7 @@ export default class LabelService extends Service {
         //     this.service.labelledItem.remove();
         //     await labelledItemCollection.remove(oldRef._id);
         // }
-        const labelledItems = added.map(id => this.ctx.repo.LabelledItem.manager.create(LabelledItem, { item: itemId, type }));
+        const labelledItems = added.map(labelId => this.ctx.repo.LabelledItem.manager.create(LabelledItem, { label: labelId, item: itemId, type }));
         await this.service.labelledItem.insert(labelledItems);
         // for (const id of added) {
         //     // const labelledItem = new LabelledItem(itemId, id, type);

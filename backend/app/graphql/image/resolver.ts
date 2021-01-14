@@ -4,6 +4,7 @@ import { createWriteStream, ReadStream } from "fs";
 import { ObjectID } from 'mongodb';
 import Image from '../../entity/sys/Image';
 import { ImageMeta } from '../../types/image';
+import { mapAsync } from '../../utils/async';
 import { copyFileAsync, statAsync, unlinkAsync } from '../../utils/fs/async';
 import { libraryPath } from '../../utils/path';
 import { getExtension } from '../../utils/string';
@@ -23,9 +24,24 @@ export = {
       const timeNow = +new Date();
       const images = await ctx.service.image.all();
       const count = images.length;
+      if (count === 0) {
+        ctx.logger.info(`No items in DB, returning 0`);
+        return {
+          items: [],
+          numPages: 0,
+          numItems: 0,
+        };
+      };
       const actor = { _id: 'a', name: 'actor', aliases: ['actor'], favorite: true, customFields: { _id: 'customFields', name: '' }, availableFields: [{ _id: 'c', name: 't', type: 'STRING' }] } as Actor;
-      const label = { _id: 'l', name: 'label', aliases: ['label'] } as Label;
-      const imgs = images.map(img => { img['labels'] = [label]; img.actors = [] as any; return img });
+
+      // const label = { _id: 'l', name: 'label', aliases: ['label'] } as Label;
+      const imgs = await mapAsync(images, async (img) => {
+        // img['labels'] = [label];
+        const labels = await ctx.service.label.getForItem(img._id);
+        img['labels'] = labels;
+        img.actors = [] as any;
+        return img;
+      });
       return {
         numItems: count,
         numPages: 1,

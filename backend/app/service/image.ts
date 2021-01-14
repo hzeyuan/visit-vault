@@ -35,7 +35,7 @@ export default class ImageService extends Service {
     // const res = await this.ctx.repo.Image.createQueryBuilder('image').insert().into(Image)
     //   .values(image as Image).execute();
   }
-  public async all() {
+  public async all(): Promise<Image[]> {
     return await this.ctx.repo.Image.manager.find(Image);
     // return await this.ctx.repo.Image.createQueryBuilder('image').getManyAndCount();
   }
