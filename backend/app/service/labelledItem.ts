@@ -20,6 +20,13 @@ export default class LabelItemService extends Service {
     public async getByType(type: string): Promise<LabelledItem[]> {
         return await this.ctx.repo.LabelledItem.manager.find(LabelledItem, { type })
     }
+    public async remove(item: string, label: string): Promise<boolean> {
+        this.ctx.repo.LabelledItem.manager.delete(LabelledItem, { item, label }).catch(() => {
+            return false
+        });
+        return true;
+    }
+
     public async removes(ids: string[]) {
         await mapAsync(ids, async (id: string) => {
             console.log('id', id.toString());

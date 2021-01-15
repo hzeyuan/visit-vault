@@ -346,6 +346,33 @@ export = {
     removeImages: async (root, args: MutationRemoveImagesArgs, ctx: Context): Promise<Mutation['removeImages']> => {
       await ctx.service.image.removes(args.ids);
       return true;
+    },
+    removeLabel: async (root, args: MutationRemoveLabelArgs, ctx: Context): Promise<Mutation['removeLabel']> => {
+      ctx.logger.info('remove Label ...');
+      const { item, label } = args;
+      return await ctx.service.labelledItem.remove(item,label);
+      // await LabelledItem.remove(item, label);
+      // if (item.startsWith("sc_")) {
+      //   const scene = await Scene.getById(item);
+      //   if (scene) {
+      //     await indexScenes([scene]);
+      //   }
+      // } else if (item.startsWith("im_")) {
+      //   const image = await Image.getById(item);
+      //   if (image) {
+      //     await indexImages([image]);
+      //   }
+      // } else if (item.startsWith("st_")) {
+      //   const studio = await Studio.getById(item);
+      //   if (studio) {
+      //     await indexStudios([studio]);
+      //   }
+      // } else if (item.startsWith("ac_")) {
+      //   const actor = await Actor.getById(item);
+      //   if (actor) {
+      //     await indexActors([actor]);
+      //   }
+      // }
     }
   }
 };

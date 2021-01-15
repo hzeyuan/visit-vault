@@ -69,4 +69,7 @@ export default class ImageService extends Service {
   public async setLabels(image: Image, labelIds: string[]): Promise<void> {
     return await this.service.label.setForItem(image._id, labelIds, "image");
   }
+  public async removeLabel() {
+    
+  }
 }
