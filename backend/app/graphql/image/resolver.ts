@@ -198,10 +198,8 @@ export = {
 
       if (args.scene) {
         const scene = await ctx.service.scene.getById(args.scene);
-
         if (scene) {
           image.scene = args.scene;
-
           const sceneActors = (await ctx.service.scene.getActors(scene)).map((a) => a._id);
           actorIds.push(...sceneActors);
           const sceneLabels = (await ctx.service.scene.getLabels(scene)).map((a) => a._id);
@@ -269,8 +267,9 @@ export = {
             // If the update sets labels, use those and ignore the existing
             imageLabels.push(...args.opts.labels);
           } else {
-            const existingLabels = (await ctx.service.image.getLabels(image)).map((l) => l._id);
-            imageLabels.push(...existingLabels);
+            const existingLabels = await ctx.service.image.getLabels(image);
+            const existingLabelIds = existingLabels.map((l) => l._id.toString());
+            imageLabels.push(...existingLabelIds);
           }
           // 设置作者
           // if (Array.isArray(args.opts.actors)) {
@@ -293,9 +292,9 @@ export = {
           // }
 
           // // 保存到数据中
-          await ctx.service.image.setLabels(image, imageLabels);
+          image['labels'] = await ctx.service.image.setLabels(image, imageLabels);
           // 这里先暂时设置labels的返回
-          image['labels'] = [];
+          // image['labels'] = [];
           if (typeof args.opts.bookmark === "number" || args.opts.bookmark === null) {
             image.bookmark = args.opts.bookmark;
           }
@@ -350,7 +349,7 @@ export = {
     removeLabel: async (root, args: MutationRemoveLabelArgs, ctx: Context): Promise<Mutation['removeLabel']> => {
       ctx.logger.info('remove Label ...');
       const { item, label } = args;
-      return await ctx.service.labelledItem.remove(item,label);
+      return await ctx.service.labelledItem.remove(item, label);
       // await LabelledItem.remove(item, label);
       // if (item.startsWith("sc_")) {
       //   const scene = await Scene.getById(item);

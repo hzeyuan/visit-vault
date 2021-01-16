@@ -13,7 +13,7 @@ class Label {
     @Column({ type: 'timestamp' })
     addedOn: number
     @Column({ type: 'string', nullable: true })
-    thumbnail: Image | null;
+    thumbnail: string | null;
     @Column({ nullable: true })
     color?: string | null;
 }

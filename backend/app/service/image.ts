@@ -1,5 +1,6 @@
 import { Service } from 'egg';
 import Image from '../entity/sys/Image'
+import Label from '../types/label';
 import { mapAsync } from '../utils/async';
 export default class ImageService extends Service {
   public async getById(id: string): Promise<Image | undefined> {
@@ -64,12 +65,14 @@ export default class ImageService extends Service {
 
   }
   public async getLabels(image: Image): Promise<Label[]> {
-    return this.service.label.getForItem(image._id);
+    return await this.service.label.getForItem(image._id);
   }
-  public async setLabels(image: Image, labelIds: string[]): Promise<void> {
-    return await this.service.label.setForItem(image._id, labelIds, "image");
+  public async setLabels(image: Image, labelIds: string[]): Promise<Label[]> {
+    if (labelIds.length == 0) return [];
+    await this.service.label.setForItem(image._id, labelIds, "image");
+    return await this.ctx.service.image.getLabels(image);
   }
   public async removeLabel() {
-    
+
   }
 }

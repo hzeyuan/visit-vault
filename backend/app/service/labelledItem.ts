@@ -35,6 +35,7 @@ export default class LabelItemService extends Service {
         });
     }
     public async insert(_labelledItem: LabelledItem | LabelledItem[]) {
+        if (Array.isArray(_labelledItem) && _labelledItem.length === 0) return;
         await this.ctx.repo.LabelledItem.manager.insert(LabelledItem, _labelledItem);
     }
     public async removeByLabel(id: string) {
