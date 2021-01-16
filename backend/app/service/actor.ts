@@ -1,9 +1,16 @@
 import { Service } from 'egg';
+import { FindManyOptions } from 'typeorm';
 import Actor from '../entity/sys/Actor'
 import ActorReference from '../entity/sys/ActorReference';
 import { isValidCountryCode } from '../types/countries';
 import { mapAsync } from '../utils/async';
 import { arrayDiff, filterInvalidAliases, validRating } from '../utils/misc';
+
+const DEFAULT_PAGE_SIZE = 20;
+const getPageSize = (take?: number): number => {
+  return take || DEFAULT_PAGE_SIZE;
+}
+
 export default class ActorService extends Service {
   public async getById(id: string): Promise<Maybe<Actor>> {
     const actor = await this.ctx.repo.Actor.manager.findOne(Actor, id)
@@ -12,6 +19,10 @@ export default class ActorService extends Service {
   public async create(_actor: Actor) {
     const actor = await this.ctx.repo.Actor.manager.create(Actor, _actor);
     return this.ctx.repo.Actor.manager.save(actor);
+  }
+  public async getPage(page: number | undefined, skip: number | undefined, take: number | undefined) {
+    const pageSize = getPageSize(take);
+    return await this.ctx.repo.Actor.manager.find(Actor, { skip: skip || Math.max(0, +(page || 0) * pageSize), take } as FindManyOptions);
   }
   public async all(): Promise<Actor[]> {
     return await this.ctx.repo.Actor.manager.find(Actor);
@@ -47,7 +58,10 @@ export default class ActorService extends Service {
     }
   }
   public async setLabels(actor: Actor, labelIds: string[]) {
-    return this.setForItem(actor._id, labelIds, "actor");
+    if (labelIds.length == 0) return [];
+    await this.service.label.setForItem(actor._id, labelIds, "actor");
+    return await this.ctx.service.actor.getLabels(actor);
+    // return this.setForItem(actor._id, labelIds, "actor");
   }
   // public async onActorCreate(actor: Actor, labels: string[], event: "actorCreated" | "actorCustom" = "actorCreated"): Promise<Actor> {
   //   const config = getConfig();

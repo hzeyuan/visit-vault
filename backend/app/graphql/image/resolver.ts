@@ -17,14 +17,15 @@ function isHexColorString(str: string) {
 
 
 export = {
-
   Query: {
-    getImages: async (root, params: QueryGetImagesArgs, ctx: Context): Promise<Query['getImages']> => {
+    getImages: async (root, options: QueryGetImagesArgs, ctx: Context): Promise<Query['getImages']> => {
+      const { query } = options;
+      const { skip, page, take } = query;
       console.log(ctx, root);
       const timeNow = +new Date();
-      const images = await ctx.service.image.all();
-      const count = images.length;
-      if (count === 0) {
+      const images = await ctx.service.image.getPage(page!, skip!, take!);
+      const total = images.length;
+      if (total === 0) {
         ctx.logger.info(`No items in DB, returning 0`);
         return {
           items: [],
@@ -33,25 +34,23 @@ export = {
         };
       };
       const actor = { _id: 'a', name: 'actor', aliases: ['actor'], favorite: true, customFields: { _id: 'customFields', name: '' }, availableFields: [{ _id: 'c', name: 't', type: 'STRING' }] } as Actor;
-
-      // const label = { _id: 'l', name: 'label', aliases: ['label'] } as Label;
       const imgs = await mapAsync(images, async (img) => {
         // img['labels'] = [label];
         const labels = await ctx.service.label.getForItem(img._id);
         img['labels'] = labels;
-        img.actors = [] as any;
+        img.actors = [];
         return img;
       });
       return {
-        numItems: count,
-        numPages: 1,
-        items: imgs as any,
+        numItems: total,
+        numPages: Math.ceil(total / 20),
+        items: imgs,
       };
     },
   },
   Mutation: {
     uploadImage: async (_: unknown,
-      args: {
+      options: {
         file: Promise<{
           filename: string;
           mimetype: string;
@@ -72,29 +71,29 @@ export = {
         };
       }, ctx: Context): Promise<Image> => {
       // 查找作者
-      for (const actor of args.actors || []) {
+      for (const actor of options.actors || []) {
         const actorInDb = await ctx.service.actor.getById(actor);
         if (!actorInDb) throw new Error(`Actor ${actor} not found`);
       }
       // 添加标签
-      for (const label of args.labels || []) {
+      for (const label of options.labels || []) {
         const labelInDb = await ctx.service.label.getById(label);
         if (!labelInDb) throw new Error(`Label ${label} not found`);
       }
       // 景点
-      if (args.scene) {
-        const sceneInDb = await ctx.service.scene.getById(args.scene);
-        if (!sceneInDb) throw new Error(`Scene ${args.scene} not found`);
+      if (options.scene) {
+        const sceneInDb = await ctx.service.scene.getById(options.scene);
+        if (!sceneInDb) throw new Error(`Scene ${options.scene} not found`);
       }
       // const config = getConfig();
-      const { filename, mimetype, createReadStream } = await args.file;
+      const { filename, mimetype, createReadStream } = await options.file;
       const ext = getExtension(filename); // 文件后缀
       const fileNameWithoutExtension = filename.split(".")[0]; // 文件前缀
 
       let imageName = fileNameWithoutExtension;
 
-      if (args.name) {
-        imageName = args.name;
+      if (options.name) {
+        imageName = options.name;
       }
 
       //不是图片格式
@@ -122,7 +121,7 @@ export = {
       // File written, now process
       ctx.logger.info(`File written to ${outPath}.`);
       let processedExt = ".jpg";
-      if (args.lossless === true) {
+      if (options.lossless === true) {
         processedExt = ".png";
       }
       if (filename.includes(".gif")) {
@@ -134,27 +133,27 @@ export = {
 
       // Process image
       if (!filename.includes(".gif")) {
-        if (args.crop) {
-          args.crop.left = Math.round(args.crop.left);
-          args.crop.top = Math.round(args.crop.top);
-          args.crop.width = Math.round(args.crop.width);
-          args.crop.height = Math.round(args.crop.height);
+        if (options.crop) {
+          options.crop.left = Math.round(options.crop.left);
+          options.crop.top = Math.round(options.crop.top);
+          options.crop.width = Math.round(options.crop.width);
+          options.crop.height = Math.round(options.crop.height);
         }
 
         const _image = await Jimp.read(outPath);
         image.hash = _image.hash();
 
-        if (args.crop) {
+        if (options.crop) {
           ctx.logger.info(`Cropping image...`);
-          _image.crop(args.crop.left, args.crop.top, args.crop.width, args.crop.height);
-          image.meta.dimensions.width = args.crop.width;
-          image.meta.dimensions.height = args.crop.height;
+          _image.crop(options.crop.left, options.crop.top, options.crop.width, options.crop.height);
+          image.meta.dimensions.width = options.crop.width;
+          image.meta.dimensions.height = options.crop.height;
         } else {
           image.meta.dimensions.width = _image.bitmap.width;
           image.meta.dimensions.height = _image.bitmap.height;
         }
 
-        if (args.compress === true) {
+        if (options.compress === true) {
           ctx.logger.info("Resizing image to thumbnail size");
           // 最大的压缩空间
           const MAX_SIZE = 10 * 1024
@@ -187,19 +186,19 @@ export = {
       }
 
       let actorIds = [] as string[];
-      if (args.actors) {
-        actorIds = args.actors;
+      if (options.actors) {
+        actorIds = options.actors;
       }
 
       let labels = [] as string[];
-      if (args.labels) {
-        labels = args.labels;
+      if (options.labels) {
+        labels = options.labels;
       }
 
-      if (args.scene) {
-        const scene = await ctx.service.scene.getById(args.scene);
+      if (options.scene) {
+        const scene = await ctx.service.scene.getById(options.scene);
         if (scene) {
-          image.scene = args.scene;
+          image.scene = options.scene;
           const sceneActors = (await ctx.service.scene.getActors(scene)).map((a) => a._id);
           actorIds.push(...sceneActors);
           const sceneLabels = (await ctx.service.scene.getLabels(scene)).map((a) => a._id);
@@ -207,9 +206,9 @@ export = {
         }
       }
 
-      // if (args.studio) {
-      //   const studio = await Studio.getById(args.studio);
-      //   if (studio) image.studio = args.studio;
+      // if (options.studio) {
+      //   const studio = await Studio.getById(options.studio);
+      //   if (studio) image.studio = options.studio;
       // }
 
       // Extract actors
@@ -238,9 +237,8 @@ export = {
       // await Image.setLabels(image, labels);
 
       // Done
-      ctx.logger.info("Creating image:");
-      ctx.logger.info(image);
-      await ctx.service.image.create(image);
+      ctx.logger.info(`image creating=> ${JSON.stringify(image)}`);
+      await ctx.service.image.upsert(image);
       // await imageCollection.upsert(image._id, image);
       // await indexImages([image]);
       await unlinkAsync(outPath);
@@ -252,28 +250,28 @@ export = {
     },
     updateImages: async (
       _: unknown,
-      args: MutationUpdateImagesArgs, ctx: Context
+      options: MutationUpdateImagesArgs, ctx: Context
     ): Promise<Image[]> => {
       // const config = getConfig();
       const updatedImages = [] as Image[];
 
-      for (const id of args.ids) {
+      for (const id of options.ids) {
         const image = await ctx.service.image.getById(id);
 
         if (image) {
           const imageLabels: string[] = [];
           // 设置标签
-          if (Array.isArray(args.opts.labels)) {
+          if (Array.isArray(options.opts.labels)) {
             // If the update sets labels, use those and ignore the existing
-            imageLabels.push(...args.opts.labels);
+            imageLabels.push(...options.opts.labels);
           } else {
             const existingLabels = await ctx.service.image.getLabels(image);
             const existingLabelIds = existingLabels.map((l) => l._id.toString());
             imageLabels.push(...existingLabelIds);
           }
           // 设置作者
-          // if (Array.isArray(args.opts.actors)) {
-          //   const actorIds = [...new Set(args.opts.actors)];
+          // if (Array.isArray(options.opts.actors)) {
+          //   const actorIds = [...new Set(options.opts.actors)];
           //   await Image.setActors(image, actorIds);
 
           //   if (
@@ -295,45 +293,44 @@ export = {
           image['labels'] = await ctx.service.image.setLabels(image, imageLabels);
           // 这里先暂时设置labels的返回
           // image['labels'] = [];
-          if (typeof args.opts.bookmark === "number" || args.opts.bookmark === null) {
-            image.bookmark = args.opts.bookmark;
+          if (typeof options.opts.bookmark === "number" || options.opts.bookmark === null) {
+            image.bookmark = options.opts.bookmark;
           }
 
-          if (typeof args.opts.favorite === "boolean") {
-            image.favorite = args.opts.favorite;
+          if (typeof options.opts.favorite === "boolean") {
+            image.favorite = options.opts.favorite;
           }
 
-          if (typeof args.opts.name === "string") {
-            image.name = args.opts.name.trim();
+          if (typeof options.opts.name === "string") {
+            image.name = options.opts.name.trim();
           }
 
-          if (typeof args.opts.rating === "number") {
-            image.rating = args.opts.rating;
+          if (typeof options.opts.rating === "number") {
+            image.rating = options.opts.rating;
           }
 
-          if (args.opts.studio !== undefined) {
-            image.studio = args.opts.studio;
+          if (options.opts.studio !== undefined) {
+            image.studio = options.opts.studio;
           }
 
-          if (args.opts.scene !== undefined) {
-            image.scene = args.opts.scene;
+          if (options.opts.scene !== undefined) {
+            image.scene = options.opts.scene;
           }
 
-          if (args.opts.color && isHexColorString(args.opts.color)) {
-            image.color = args.opts.color;
+          if (options.opts.color && isHexColorString(options.opts.color)) {
+            image.color = options.opts.color;
           }
 
-          if (args.opts.customFields) {
-            for (const key in args.opts.customFields) {
-              const value = args.opts.customFields[key] !== undefined ? args.opts.customFields[key] : null;
+          if (options.opts.customFields) {
+            for (const key in options.opts.customFields) {
+              const value = options.opts.customFields[key] !== undefined ? options.opts.customFields[key] : null;
               ctx.logger.info(`Set scene custom.${key} to ${JSON.stringify(value)}`);
-              args.opts.customFields[key] = value;
+              options.opts.customFields[key] = value;
             }
-            image.customFields = args.opts.customFields;
+            image.customFields = options.opts.customFields;
           }
-
-          await ctx.service.image.create(image);
-          // await imageCollection.upsert(image._id, image);
+          ctx.logger.info(`image upsert=> ${JSON.stringify(image)}`);
+          await ctx.service.image.upsert(image);
           updatedImages.push(image as any);
         } else {
           throw new Error(`Image ${id} not found`);
@@ -342,13 +339,13 @@ export = {
       // await indexImages(updatedImages);
       return updatedImages;
     },
-    removeImages: async (root, args: MutationRemoveImagesArgs, ctx: Context): Promise<Mutation['removeImages']> => {
-      await ctx.service.image.removes(args.ids);
+    removeImages: async (root, options: MutationRemoveImagesArgs, ctx: Context): Promise<Mutation['removeImages']> => {
+      await ctx.service.image.removes(options.ids);
       return true;
     },
-    removeLabel: async (root, args: MutationRemoveLabelArgs, ctx: Context): Promise<Mutation['removeLabel']> => {
+    removeLabel: async (root, options: MutationRemoveLabelArgs, ctx: Context): Promise<Mutation['removeLabel']> => {
       ctx.logger.info('remove Label ...');
-      const { item, label } = args;
+      const { item, label } = options;
       return await ctx.service.labelledItem.remove(item, label);
       // await LabelledItem.remove(item, label);
       // if (item.startsWith("sc_")) {

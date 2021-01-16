@@ -1,6 +1,6 @@
 import { Service } from 'egg';
-import Label from '../entity/sys/Label';
 import { ObjectID } from 'mongodb';
+import Label from '../entity/sys/Label';
 import LabelledItem from '../entity/sys/LabelledItem';
 import { arrayDiff } from '../utils/misc';
 export default class LabelService extends Service {

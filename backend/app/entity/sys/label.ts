@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ObjectID, ObjectIdColumn } from 'typeorm';
-import { generateHash } from '../../utils/hash';
 
 
 @Entity()
@@ -13,7 +12,7 @@ class Label {
     @Column({ type: 'timestamp' })
     addedOn: number
     @Column({ type: 'string', nullable: true })
-    thumbnail: string | null;
+    thumbnail: Image | null;
     @Column({ nullable: true })
     color?: string | null;
 }

@@ -7,69 +7,16 @@ import { filterInvalidAliases, isArrayEq } from '../../utils/misc';
 export = {
 
   Query: {
-    getActors: async (root, params: QueryGetActorsArgs, ctx: Context): Promise<| {
+    getActors: async (root, options: QueryGetActorsArgs, ctx: Context): Promise<| {
       numItems: number,
       numPages: number,
       items: Actor[],
     }
       | undefined> => {
-      console.log(ctx, root);
-      const timeNow = +new Date();
-      // const query = () => {
-      //   if (options.query && options.query.length) {
-      //     return [
-      //       {
-      //         multi_match: {
-      //           query: options.query || "",
-      //           fields: ["name^1.5", "labelNames", "nationalityName^0.75"],
-      //           fuzziness: "AUTO",
-      //         },
-      //       },
-      //     ];
-      //   }
-      //   return [];
-      // };
-
-      // const nationality = () => {
-      //   if (options.nationality) {
-      //     return [
-      //       {
-      //         term: {
-      //           countryCode: options.nationality,
-      //         },
-      //       },
-      //     ];
-      //   }
-      //   return [];
-      // };
-      // const result = await getClient().search<IActorSearchDoc>({
-      //   index: indexMap.actors,
-      //   ...getPage(options.page, options.skip, options.take),
-      //   body: {
-      //     ...sort(options.sortBy, options.sortDir, options.query),
-      //     track_total_hits: true,
-      //     query: {
-      //       bool: {
-      //         must: shuffle(shuffleSeed, options.sortBy, query().filter(Boolean)),
-      //         filter: [
-      //           ratingFilter(options.rating),
-      //           ...bookmark(options.bookmark),
-      //           ...favorite(options.favorite),
-
-      //           ...includeFilter(options.include),
-      //           ...excludeFilter(options.exclude),
-
-      //           ...arrayFilter(options.studios, "studios", "OR"),
-
-      //           ...nationality(),
-
-      //           ...extraFilter,
-      //         ],
-      //       },
-      //     },
-      //   },
-      // });
-      let actors = await ctx.service.actor.all();
+      const { query } = options;
+      const { skip, page, take } = query;
+      // let actors = await ctx.service.actor.all();
+      const actors = await ctx.service.actor.getPage(page!, skip!, take!);
       const total = actors.length;
       if (total === 0) {
         ctx.logger.info(`No items in ES, returning 0`);
@@ -82,21 +29,17 @@ export = {
       // 给actor设置标签
       await mapAsync(actors, async (actor) => {
         const labels = await ctx.service.actor.getLabels(actor)
-        console.log('labels', labels);
-        if (labels) {
-          actor['labels'] = labels;
-        }
+        if (labels) actor['labels'] = labels;
         return actor
-      })
-
+      });
       return {
         numItems: total,
         numPages: Math.ceil(total / 20),
         items: actors,
       };
     },
-    getActorById: async (root, params: QueryGetActorByIdArgs, ctx: Context): Promise<Actor | null> => {
-      const actor = await ctx.service.actor.getById(params.id);
+    getActorById: async (root, options: QueryGetActorByIdArgs, ctx: Context): Promise<Actor | null> => {
+      const actor = await ctx.service.actor.getById(options.id);
       if (!actor) return null;
       actor['numScenes'] = 0
       actor.customFields = {};
@@ -107,16 +50,16 @@ export = {
     },
   },
   Mutation: {
-    addActor: async (root, args: MutationAddActorArgs, ctx: Context) => {
+    addActor: async (root, options: MutationAddActorArgs, ctx: Context) => {
       // const config = getConfig();
       const { logger } = ctx;
-      const aliases = filterInvalidAliases(args.aliases || []);
-      const actor = await ctx.service.actor.create({ name: args.name, aliases, favorite: false } as Actor);
-      // let actor = new Actor(args.name, aliases);
+      const aliases = filterInvalidAliases(options.aliases || []);
+      const actor = await ctx.service.actor.create({ name: options.name, aliases, favorite: false } as Actor);
+      // let actor = new Actor(options.name, aliases);
 
       let actorLabels = [] as string[];
-      if (args.labels) {
-        actorLabels = args.labels;
+      if (options.labels) {
+        actorLabels = options.labels;
       }
 
       // 插件相关设置
@@ -137,8 +80,8 @@ export = {
       // await indexActors([actor]);
       return actor;
     },
-    updateActors: async (root, args: MutationUpdateActorsArgs, ctx: Context) => {
-      const { ids, opts } = args;
+    updateActors: async (root, options: MutationUpdateActorsArgs, ctx: Context) => {
+      const { ids, opts } = options;
       // const config = getConfig();
       const updatedActors = [] as Actor[];
 
