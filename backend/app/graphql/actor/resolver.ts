@@ -44,6 +44,7 @@ export = {
       actor['numScenes'] = 0
       actor.customFields = {};
       actor['collabs'] = [];
+      actor.avatar = 'https://avatars2.githubusercontent.com/u/29333699?s=460&u=0c288b893224afe4d909bc4bc8ef0524805b480d&v=4'
       actor['labels'] = []
       return actor;
 
