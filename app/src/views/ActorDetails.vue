@@ -83,10 +83,10 @@
                 </div>-->
                 <v-divider class="mb-2"></v-divider>
                 <div class="px-2">
-                  <div v-if="currentActor.aliases.length" class="py-1 med--text body-2">
+                  <!-- <div v-if="currentActor.aliases.length" class="py-1 med--text body-2">
                     a.k.a.
                     {{ currentActor.aliases.filter((s) => !s.startsWith("regex:")).join(", ") }}
-                  </div>
+                  </div> -->
                   <div v-if="currentActor.bornOn" class="py-1">
                     Born on
                     {{
@@ -100,20 +100,21 @@
                     <template v-slot:activator="{ on }">
                       <div v-on="on" class="d-flex align-center">
                         <b>
-                          <pre>{{ currentActor.watches.length }} </pre>
+                          <!-- <pre>{{ currentActor.watches.length }} </pre> -->
                         </b>
                         <span class="med-text">views</span>
                       </div>
                     </template>
-                    <span v-if="currentActor.watches.length">
+                    <!-- <span v-if="currentActor.watches.length"> -->
                       Last watched:
-                      {{
+                      <!-- {{
                         new Date(
                           currentActor.watches[currentActor.watches.length - 1]
                         ).toLocaleString()
-                      }}
-                    </span>
-                    <span v-else>You haven't watched {{ currentActor.name }} yet!</span>
+                      }} -->
+                    <!-- </span> -->
+                    <!-- <span v-else>You haven't watched {{ currentActor.name }} yet!</span> -->
+                    <span>You haven't watched {{ currentActor.name }} yet!</span>
                   </v-tooltip>
                   <v-divider class="mt-2"></v-divider>
                   <div class="text-center mt-2">
@@ -387,7 +388,7 @@
       max-width="400px"
     >
       <ImageUploader
-        :labels="currentActor.labels.map((l) => l._id)"
+       :labels="currentActor.labels.map((l) => l._id)"
         :name="currentActor.name"
         :actors="[currentActor._id]"
         @update-state="isUploading = $event"
@@ -786,25 +787,26 @@ export default class ActorDetails extends Vue {
   }
 
   loadMoviePage() {
-    this.fetchMoviePage().then((items) => {
-      if (items.length) {
-        this.moviePage++;
-        this.movies.push(...items);
-      } else {
-        this.moreMovies = false;
-      }
-    });
+    // this.fetchMoviePage().then((items) => {
+    //   console.log('fetchMoviePage',items);
+    //   if (items.length) {
+    //     this.moviePage++;
+    //     this.movies.push(...items);
+    //   } else {
+    //     this.moreMovies = false;
+    //   }
+    // });
   }
 
   loadScenePage() {
-    this.fetchScenePage().then((items) => {
-      if (items.length) {
-        this.scenePage++;
-        this.scenes.push(...items);
-      } else {
-        this.moreScenes = false;
-      }
-    });
+    // this.fetchScenePage().then((items) => {
+    //   if (items.length) {
+    //     this.scenePage++;
+    //     this.scenes.push(...items);
+    //   } else {
+    //     this.moreScenes = false;
+    //   }
+    // });
   }
 
   loadImagePage() {
@@ -819,83 +821,83 @@ export default class ActorDetails extends Vue {
   }
 
   async fetchMoviePage() {
-    if (!this.currentActor) return;
+    // if (!this.currentActor) return;
 
-    const result = await ApolloClient.query({
-      query: gql`
-        query($query: MovieSearchQuery!) {
-          getMovies(query: $query) {
-            numItems
-            items {
-              ...MovieFragment
-              actors {
-                ...ActorFragment
-              }
-              studio {
-                ...StudioFragment
-              }
-              scenes {
-                ...SceneFragment
-              }
-            }
-          }
-        }
-        ${actorFragment}
-        ${studioFragment}
-        ${movieFragment}
-        ${sceneFragment}
-      `,
-      variables: {
-        query: {
-          query: "",
-          actors: [this.currentActor._id],
-          page: this.moviePage,
-          sortDir: "desc",
-          sortBy: "addedOn",
-        },
-      },
-    });
+    // const result = await ApolloClient.query({
+    //   query: gql`
+    //     query($query: MovieSearchQuery!) {
+    //       getMovies(query: $query) {
+    //         numItems
+    //         items {
+    //           ...MovieFragment
+    //           actors {
+    //             ...ActorFragment
+    //           }
+    //           studio {
+    //             ...StudioFragment
+    //           }
+    //           scenes {
+    //             ...SceneFragment
+    //           }
+    //         }
+    //       }
+    //     }
+    //     ${actorFragment}
+    //     ${studioFragment}
+    //     ${movieFragment}
+    //     ${sceneFragment}
+    //   `,
+    //   variables: {
+    //     query: {
+    //       query: "",
+    //       actors: [this.currentActor._id],
+    //       page: this.moviePage,
+    //       sortDir: "desc",
+    //       sortBy: "addedOn",
+    //     },
+    //   },
+    // });
 
-    this.numMovies = result.data.getMovies.numItems;
-    return result.data.getMovies.items;
+    // this.numMovies = result.data.getMovies.numItems;
+    // return result.data.getMovies.items;
   }
 
   async fetchScenePage() {
     if (!this.currentActor) return;
 
-    const result = await ApolloClient.query({
-      query: gql`
-        query($query: SceneSearchQuery!) {
-          getScenes(query: $query) {
-            numItems
-            items {
-              ...SceneFragment
-              actors {
-                ...ActorFragment
-              }
-              studio {
-                ...StudioFragment
-              }
-            }
-          }
-        }
-        ${sceneFragment}
-        ${actorFragment}
-        ${studioFragment}
-      `,
-      variables: {
-        query: {
-          query: "",
-          actors: [this.currentActor._id],
-          page: this.scenePage,
-          sortDir: "desc",
-          sortBy: "addedOn",
-        },
-      },
-    });
+    // const result = await ApolloClient.query({
+    //   query: gql`
+    //     query($query: SceneSearchQuery!) {
+    //       getScenes(query: $query) {
+    //         numItems
+    //         items {
+    //           ...SceneFragment
+    //           actors {
+    //             ...ActorFragment
+    //           }
+    //           studio {
+    //             ...StudioFragment
+    //           }
+    //         }
+    //       }
+    //     }
+    //     ${sceneFragment}
+    //     ${actorFragment}
+    //     ${studioFragment}
+    //   `,
+    //   variables: {
+    //     query: {
+    //       query: "",
+    //       actors: [this.currentActor._id],
+    //       page: this.scenePage,
+    //       sortDir: "desc",
+    //       sortBy: "addedOn",
+    //     },
+    //   },
+    // });
 
-    this.numScenes = result.data.getScenes.numItems;
-    return result.data.getScenes.items;
+    // this.numScenes = result.data.getScenes.numItems;
+    // return result.data.getScenes.items;
   }
 
   async fetchImagePage() {
@@ -913,10 +915,10 @@ export default class ActorDetails extends Vue {
                 name
                 color
               }
-              studio {
-                _id
-                name
-              }
+              # studio {
+              #   _id
+              #   name
+              # }
               actors {
                 ...ActorFragment
                 avatar {
@@ -924,10 +926,10 @@ export default class ActorDetails extends Vue {
                   color
                 }
               }
-              scene {
-                _id
-                name
-              }
+              # scene {
+              #   _id
+              #   name
+              # }
             }
           }
         }
@@ -1456,6 +1458,7 @@ export default class ActorDetails extends Vue {
   }
 
   get currentActor() {
+    console.log('currentActor',actorModule.current)
     return actorModule.current;
   }
 
@@ -1593,7 +1596,7 @@ export default class ActorDetails extends Vue {
       variables: {
         ids: [this.currentActor._id],
         opts: {
-          labels: labels.map((l) => l._id),
+          labels: labels.map((l) => l._id)
         },
       },
     })
@@ -1621,34 +1624,34 @@ export default class ActorDetails extends Vue {
   openLabelSelector() {
     if (!this.currentActor) return;
 
-    if (!this.allLabels.length) {
-      ApolloClient.query({
-        query: gql`
-          {
-            getLabels {
-              _id
-              name
-              aliases
-              color
-            }
-          }
-        `,
-      })
-        .then((res) => {
-          if (!this.currentActor) return;
+    // if (!this.allLabels.length) {
+    //   ApolloClient.query({
+    //     query: gql`
+    //       {
+    //         getLabels {
+    //           _id
+    //           name
+    //           aliases
+    //           color
+    //         }
+    //       }
+    //     `,
+    //   })
+    //     .then((res) => {
+    //       if (!this.currentActor) return;
 
-          this.allLabels = res.data.getLabels;
-          this.selectedLabels = this.currentActor.labels.map((l) =>
-            this.allLabels.findIndex((k) => k._id == l._id)
-          );
-          this.labelSelectorDialog = true;
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    } else {
-      this.labelSelectorDialog = true;
-    }
+    //       this.allLabels = res.data.getLabels;
+    //       this.selectedLabels = this.currentActor.labels.map((l) =>
+    //         this.allLabels.findIndex((k) => k._id == l._id)
+    //       );
+    //       this.labelSelectorDialog = true;
+    //     })
+    //     .catch((err) => {
+    //       console.error(err);
+    //     });
+    // } else {
+    //   this.labelSelectorDialog = true;
+    // }
   }
 
   imageLink(image: any) {
@@ -1764,22 +1767,22 @@ export default class ActorDetails extends Vue {
               name
               color
             }
-            thumbnail {
-              _id
-              color
-            }
-            altThumbnail {
-              _id
-            }
-            watches
-            hero {
-              _id
-              color
-            }
-            avatar {
-              _id
-              color
-            }
+            # thumbnail {
+            #   _id
+            #   color
+            # }
+            # altThumbnail {
+            #   _id
+            # }
+            # watches
+            # hero {
+            #   _id
+            #   color
+            # }
+            # avatar {
+            #   _id
+            #   color
+            # }
           }
         }
         ${actorFragment}

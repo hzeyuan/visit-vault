@@ -11,18 +11,18 @@ export default gql`
     rating
     favorite
     bookmark
-    customFields
-    availableFields {
-      _id
-      name
-      type
-      values
-      unit
-    }
-    nationality {
-      name
-      alpha2
-      nationality
-    }
+    # customFields
+    # availableFields {
+    #   _id
+    #   name
+    #   type
+    #   values
+    #   unit
+    # }
+    # nationality {
+    #   name
+    #   alpha2
+    #   nationality
+    #}
   }
 `;

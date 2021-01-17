@@ -687,7 +687,7 @@ export default class ActorList extends mixins(DrawerMixin) {
                 altThumbnail {
                   _id
                 }
-                numScenes
+                # numScenes
               }
               numItems
               numPages
