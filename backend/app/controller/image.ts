@@ -4,7 +4,7 @@ import * as path from 'path';
 
 export default class ImageController extends Controller {
   public async image() {
-    // console.log('image', this.ctx.params);
+    console.log('image', this.ctx.params);
     const image = await this.service.image.getById(this.ctx.params.image);
     // todo :返回一个image对象
     // const image = {
@@ -24,12 +24,9 @@ export default class ImageController extends Controller {
   public async imageThumbnail() {
     // const image = await Image.getById(req.params.image);
     const image = await this.service.image.getById(this.ctx.params.image);
-    // const image = {
-    //   thumbPath: 'public/flags/ad.svg',
-    // } as Image;
     if (image && image.thumbPath) {
       const resolved = path.resolve(`${image.thumbPath}`);
-      this.logger.debug(`get image ==> ${image.thumbPath}`);
+      this.logger.info(`get image ==> ${image.thumbPath}`);
       if (!fs.existsSync(resolved)) {
         this.ctx.redirect('/broken');
       } else {
@@ -42,7 +39,7 @@ export default class ImageController extends Controller {
         },
       };
       this.logger.info(`${this.ctx.params.image}'s thumbnail does not exist (yet)`);
-      this.ctx.redirect(`/media/image/${image._id}?password=${config.auth.password}`);
+      this.ctx.redirect(`/media/image/${image._id.toString()}?password=${config.auth.password}`);
     } else {
       this.ctx.redirect('/broken');
     }

@@ -1681,6 +1681,7 @@ export default class ActorDetails extends Vue {
   }
 
   get thumbnail() {
+    console.log('get thumbail',this.currentActor);
     if (this.currentActor && this.currentActor.thumbnail) {
       return `${serverBase}/media/image/${
         this.currentActor.thumbnail._id
@@ -1767,22 +1768,22 @@ export default class ActorDetails extends Vue {
               name
               color
             }
-            # thumbnail {
-            #   _id
-            #   color
-            # }
-            # altThumbnail {
-            #   _id
-            # }
+            thumbnail {
+              _id
+              color
+            }
+            altThumbnail {
+              _id
+            }
             # watches
-            # hero {
-            #   _id
-            #   color
-            # }
-            # avatar {
-            #   _id
-            #   color
-            # }
+            hero {
+              _id
+              color
+            }
+            avatar {
+              _id
+              color
+            }
           }
         }
         ${actorFragment}

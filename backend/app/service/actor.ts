@@ -268,4 +268,8 @@ export default class ActorService extends Service {
   //     )}`
   //   );
   // }
+  public async upsert(_actor: Actor) {
+    const actor = this.ctx.repo.Actor.manager.create(Actor, _actor);
+    return await this.ctx.repo.Actor.manager.save(actor);
+  }
 }

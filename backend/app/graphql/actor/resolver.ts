@@ -44,7 +44,7 @@ export = {
       actor['numScenes'] = 0
       actor.customFields = {};
       actor['collabs'] = [];
-      actor.avatar = 'https://avatars2.githubusercontent.com/u/29333699?s=460&u=0c288b893224afe4d909bc4bc8ef0524805b480d&v=4'
+      // actor.avatar = 'https://avatars2.githubusercontent.com/u/29333699?s=460&u=0c288b893224afe4d909bc4bc8ef0524805b480d&v=4'
       actor['labels'] = []
       return actor;
 
@@ -135,20 +135,29 @@ export = {
             actor.description = opts.description.trim();
           }
 
-          if (typeof opts.avatar === "string" && !opts.avatar) {
-            actor.avatar = opts.avatar;
+          if (typeof opts.avatar === "string" && opts.avatar) {
+            const avatar = await ctx.service.image.getById(opts.avatar);
+            if (!avatar) return;
+            console.log('avatar', avatar);
+            actor.avatar = avatar;
           }
 
-          if (typeof opts.thumbnail === "string" || opts.thumbnail === null) {
-            actor.thumbnail = opts.thumbnail;
+          if (typeof opts.thumbnail === "string" && opts.thumbnail) {
+            const thumbnail = await ctx.service.image.getById(opts.thumbnail);
+            if (!thumbnail) return;
+            actor.thumbnail = thumbnail;
           }
 
-          if (typeof opts.altThumbnail === "string" || opts.altThumbnail === null) {
-            actor.altThumbnail = opts.altThumbnail;
+          if (typeof opts.altThumbnail === "string" && opts.altThumbnail) {
+            const altThumbnail = await ctx.service.image.getById(opts.altThumbnail);
+            if (!altThumbnail) return;
+            actor.altThumbnail = altThumbnail;
           }
 
-          if (typeof opts.hero === "string" || opts.hero === null) {
-            actor.hero = opts.hero;
+          if (typeof opts.hero === "string" && opts.hero) {
+            const hero = await ctx.service.image.getById(opts.hero);
+            if (!hero) return;
+            actor.hero = hero;
           }
 
           if (typeof opts.rating === "number") {
@@ -167,7 +176,7 @@ export = {
             }
             actor.customFields = opts.customFields;
           }
-
+          await ctx.service.actor.upsert(actor);
           // await actorCollection.upsert(actor._id, actor);
           updatedActors.push(actor);
         } else {
@@ -186,7 +195,6 @@ export = {
         //   });
         // }
       }
-
       // await indexActors(updatedActors);
       return updatedActors;
     },

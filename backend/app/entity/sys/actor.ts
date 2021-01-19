@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ObjectID, ObjectIdColumn } from 'typeorm';
-
+import Image from '../sys/Image';
 
 @Entity()
 class Actor {
@@ -14,13 +14,13 @@ class Actor {
     @Column({ type: 'number', nullable: true })
     bornOn: number | null;
     @Column({ type: 'number', nullable: true })
-    thumbnail: string | null
+    thumbnail?: Image
     @Column({ type: 'string', nullable: true })
-    altThumbnail: string | null;
+    altThumbnail?: Image;
     @Column({ type: 'string', nullable: true })
-    hero?: string | null;
+    hero?: Image;
     @Column({ nullable: true })
-    avatar?: string
+    avatar?: Image;
     @Column({ default: false, generated: true })
     favorite: boolean;
     @Column({ type: 'string', nullable: true })

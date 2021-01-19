@@ -6,7 +6,7 @@ import { mapAsync } from '../utils/async';
 
 const DEFAULT_PAGE_SIZE = 20;
 
-const getPageSize = (take?: number): number => {
+const getPageSize = (take?: number | null): number => {
   return take || DEFAULT_PAGE_SIZE;
 }
 
@@ -16,9 +16,9 @@ export default class ImageService extends Service {
     const image = await this.ctx.repo.Image.manager.findOne(Image, { _id: id })
     return image;
   }
-  public async getPage(page: number | undefined, skip: number | undefined, take: number | undefined) {
+  public async getPage(page?: number, skip?: number, take?: number, filters = {}) {
     const pageSize = getPageSize(take);
-    return await this.ctx.repo.Image.manager.find(Image, { skip: skip || Math.max(0, +(page || 0) * pageSize), take } as FindManyOptions);
+    return await this.ctx.repo.Image.manager.find(Image, { skip: skip || Math.max(0, +(page || 0) * pageSize), take, ...filters } as FindManyOptions);
   }
   public async upsert(image: Image) {
     const img = this.ctx.repo.Image.manager.create(Image, image);

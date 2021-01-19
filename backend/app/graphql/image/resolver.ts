@@ -19,11 +19,26 @@ function isHexColorString(str: string) {
 export = {
   Query: {
     getImages: async (root, options: QueryGetImagesArgs, ctx: Context): Promise<Query['getImages']> => {
-      const { query } = options;
+      const {query } = options;
       const { skip, page, take } = query;
-      console.log(ctx, root);
       const timeNow = +new Date();
-      const images = await ctx.service.image.getPage(page!, skip!, take!);
+      //  这里需要先实现actor_ref
+      // 通过actor_ref找到，image_id,聚合起来
+      // 需要过滤作者
+      if (query.actors!) {
+        
+      }
+      const filters = {
+        where: {
+          actor:{$eq:''},
+        }
+      }
+      const images = await ctx.service.image.getPage(
+        page || 0,
+        skip || 0,
+        take || undefined,
+        // filters
+      );
       const total = images.length;
       if (total === 0) {
         ctx.logger.info(`No items in DB, returning 0`);
@@ -37,7 +52,9 @@ export = {
       const imgs = await mapAsync(images, async (img) => {
         // img['labels'] = [label];
         const labels = await ctx.service.label.getForItem(img._id);
+        // const actors = await ctx.service.actor.getForItem(img._id);
         img['labels'] = labels;
+
         img.actors = [];
         return img;
       });
