@@ -57,4 +57,59 @@ export default class ImageService extends Service {
   public async removeLabel() {
 
   }
+  // 搜索查询图片
+  public async searchImages(options: ImageSearchQuery): Promise<ImageSearchResults> {
+
+    // 存在作者
+    const actorsFilters = (actors?: string[] | null) => {
+      return actors ? {
+        where: { $in: actors },
+      } : {}
+    }
+    const ratingFilters = (rate?: number | null, key: 'eq' | 'lt' | 'lg' = 'eq') => {
+      return rate ? {
+        where: { [`${key}`]: rate },
+      } : {}
+    }
+    const bookmarkFilters = (bookmark?: boolean | null) => {
+      return bookmark ? {
+        where: { $eq: bookmark },
+      } : {}
+    }
+    const favoriteFilters = (favorite?: boolean | null) => {
+      return favorite ? {
+        where: { $eq: favorite },
+      } : {}
+    }
+    const filters = {
+      ...actorsFilters(options.actors),
+      ...ratingFilters(options.rating, 'eq'),
+      ...bookmarkFilters(options.bookmark),
+      ...favoriteFilters(options.favorite),
+    }
+    const images = await this.getPage(options.page || 0, options.skip || 0, options.take || undefined, filters)
+    const total = images.length;
+    if (total === 0) {
+      this.ctx.logger.info(`No items in DB, returning 0`);
+      return {
+        items: [],
+        numPages: 0,
+        numItems: 0,
+      };
+    };
+    const imgs = await mapAsync(images, async (img) => {
+      // img['labels'] = [label];
+      const labels = await this.ctx.service.label.getForItem(img._id);
+      // const actors = await ctx.service.actor.getForItem(img._id);
+      img['labels'] = labels;
+
+      img.actors = [];
+      return img;
+    });
+    return {
+      numItems: total,
+      numPages: Math.ceil(total / 20),
+      items: imgs,
+    };
+  }
 }
