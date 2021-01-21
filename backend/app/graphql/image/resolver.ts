@@ -4,7 +4,6 @@ import { createWriteStream, ReadStream } from "fs";
 import { ObjectID } from 'mongodb';
 import Image from '../../entity/sys/Image';
 import { ImageMeta } from '../../types/image';
-import { mapAsync } from '../../utils/async';
 import { copyFileAsync, statAsync, unlinkAsync } from '../../utils/fs/async';
 import { libraryPath } from '../../utils/path';
 import { getExtension } from '../../utils/string';

@@ -3,6 +3,7 @@ import { FindManyOptions } from 'typeorm';
 import Image from '../entity/sys/Image'
 // import Label from '../types/label';
 import { mapAsync } from '../utils/async';
+import ActorService from './actor';
 
 const DEFAULT_PAGE_SIZE = 20;
 
@@ -62,23 +63,33 @@ export default class ImageService extends Service {
 
     // 存在作者
     const actorsFilters = (actors?: string[] | null) => {
-      return actors ? {
-        where: { $in: actors },
+      return actors && actors.length > 0 ? {
+        where: { actors: { $in: actors } },
       } : {}
     }
     const ratingFilters = (rate?: number | null, key: 'eq' | 'lt' | 'lg' = 'eq') => {
       return rate ? {
-        where: { [`${key}`]: rate },
+        where: {
+          rate: { [`${key}`]: rate }
+        },
       } : {}
     }
     const bookmarkFilters = (bookmark?: boolean | null) => {
       return bookmark ? {
-        where: { $eq: bookmark },
+        where: {
+          bookmark:
+            { $eq: bookmark }
+        }
+        ,
       } : {}
     }
     const favoriteFilters = (favorite?: boolean | null) => {
       return favorite ? {
-        where: { $eq: favorite },
+
+        where: {
+          favorite:
+            { $eq: favorite }
+        },
       } : {}
     }
     const filters = {

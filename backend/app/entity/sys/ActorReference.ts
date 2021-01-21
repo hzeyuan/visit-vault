@@ -12,5 +12,6 @@ class ActorReference {
     actor: string;
     @Column()
     type: string;
+
 }
 export default ActorReference;

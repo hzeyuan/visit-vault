@@ -7,7 +7,10 @@ export default class ActorReferenceService extends Service {
         const actorReference = this.ctx.repo.ActorReference.manager.create(ActorReference, _actorReference);
         return await this.ctx.repo.ActorReference.manager.save(actorReference);
     }
-    public async getByItem(id: string): Promise<ActorReference[]> {
-        return [];
+    public async getByItem(item: string): Promise<ActorReference[]> {
+        return await this.ctx.repo.ActorReference.find({ item });
+    }
+    public async getByActor(actor: string): Promise<ActorReference[]> {
+        return await this.ctx.repo.ActorReference.find({ actor: actor });
     }
 }
