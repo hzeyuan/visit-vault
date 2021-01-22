@@ -2,9 +2,7 @@ import { Service } from 'egg';
 import { FindManyOptions } from 'typeorm';
 import Image from '../entity/sys/Image'
 import Actor from '../entity/sys/Actor';
-// import Label from '../types/label';
 import { mapAsync } from '../utils/async';
-import ActorReference from '../entity/sys/ActorReference';
 
 const DEFAULT_PAGE_SIZE = 20;
 
@@ -17,10 +15,6 @@ export default class ImageService extends Service {
   public async getById(id: string): Promise<Image | undefined> {
     const image = await this.ctx.repo.Image.manager.findOne(Image, { _id: id })
     return image;
-  }
-  public async getPage(page?: number, skip?: number, take?: number, filters = {}) {
-    const pageSize = getPageSize(take);
-    return await this.ctx.repo.Image.manager.find(Image, { skip: skip || Math.max(0, +(page || 0) * pageSize), take, ...filters } as FindManyOptions);
   }
   public async upsert(image: Image) {
     const img = this.ctx.repo.Image.manager.create(Image, image);
@@ -39,7 +33,6 @@ export default class ImageService extends Service {
   public async removes(ids: string[]) {
     await mapAsync(ids, async (id: string) => {
       await this.ctx.repo.Image.manager.delete(Image, { _id: id });
-      // await this.ctx.repo.Image.createQueryBuilder('image').where('image._id = :id', { id }).delete().execute();
     });
   }
   public async insert(_image: Image) {
@@ -69,49 +62,21 @@ export default class ImageService extends Service {
   }
   // 搜索查询图片
   public async searchImages(options: ImageSearchQuery): Promise<ImageSearchResults> {
-
-    // 存在作者
-    const actorsFilters = async (actors?: string[] | null) => {
-      const actorRef = await this.ctx.repo.ActorReference.find({
-        where: { actor: { $in: actors } },
-      });
-      const imageIds = actorRef.map(actor => actor.item);
-      return actors && actors.length > 0 ? {
-        where: { _id: { $in: imageIds } },
-      } : {}
-    }
-    const ratingFilters = (rate?: number | null, key: 'eq' | 'lt' | 'lg' = 'eq') => {
-      return rate ? {
-        where: {
-          rate: { [`${key}`]: rate }
-        },
-      } : {}
-    }
-    const bookmarkFilters = (bookmark?: boolean | null) => {
-      return bookmark ? {
-        where: {
-          bookmark:
-            { $eq: bookmark }
-        }
-        ,
-      } : {}
-    }
-    const favoriteFilters = (favorite?: boolean | null) => {
-      return favorite ? {
-
-        where: {
-          favorite:
-            { $eq: favorite }
-        },
-      } : {}
-    }
+    const pageSize = getPageSize(options.take || null);
     const filters = {
-      ...await actorsFilters(options.actors),
-      ...ratingFilters(options.rating, 'eq'),
-      ...bookmarkFilters(options.bookmark),
-      ...favoriteFilters(options.favorite),
+      ...await this.service.search.actorsFilters(options.actors),
+      ...await this.service.search.labelsFilters(options.include),
+      ...this.service.search.ratingFilters(options.rating, 'eq'),
+      ...this.service.search.bookmarkFilters(options.bookmark),
+      ...this.service.search.favoriteFilters(options.favorite),
     }
-    const images = await this.getPage(options.page || 0, options.skip || 0, options.take || undefined, filters)
+    const images = await this.ctx.repo.Image.manager.find(Image,
+      {
+        skip: options.skip || Math.max(0, +(options.page || 0) * pageSize),
+        take: options.take,
+        ...filters,
+        ...this.service.search.sortBy(options.sortBy, options.sortDir),
+      } as FindManyOptions);
     const total = images.length;
     if (total === 0) {
       this.ctx.logger.info(`No items in DB, returning 0`);

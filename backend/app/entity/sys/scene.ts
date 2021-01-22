@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ObjectID, ObjectIdColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ObjectID, ObjectIdColumn, CreateDateColumn } from 'typeorm';
 
 @Entity()
 class IDimensions {
@@ -30,7 +30,7 @@ class Scene {
     name: string;
     @Column({ type: 'string', nullable: true })
     description: string | null;
-    @Column({ type: 'timestamp' })
+    @CreateDateColumn({ type: 'timestamp' })
     addedOn: number;
     @Column({ type: 'number', nullable: true })
     releaseDate: number | null;

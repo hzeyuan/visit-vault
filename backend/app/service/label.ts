@@ -50,17 +50,7 @@ export default class LabelService extends Service {
         const { removed, added } = arrayDiff(oldRefs, [...new Set(labelIds)], "label", (l) => l);
         const oldRefIds = removed.map(oldRef => oldRef._id);
         await this.service.labelledItem.removes(oldRefIds);
-        // for (const oldRef of removed) {
-        //     this.service.labelledItem.remove();
-        //     await labelledItemCollection.remove(oldRef._id);
-        // }
         const labelledItems = added.map(labelId => this.ctx.repo.LabelledItem.manager.create(LabelledItem, { label: labelId, item: itemId, type }));
         await this.service.labelledItem.insert(labelledItems);
-        // for (const id of added) {
-        //     // const labelledItem = new LabelledItem(itemId, id, type);
-        //     const labelledItem = this.ctx.repo.LabelledItem.manager.create(LabelledItem, { ..._labelledItem });
-        //     this.ctx.logger.info(`Adding label: ${JSON.stringify(labelledItem)}`);
-        //     await labelledItemCollection.upsert(labelledItem._id, labelledItem);
-        // }
     }
 }

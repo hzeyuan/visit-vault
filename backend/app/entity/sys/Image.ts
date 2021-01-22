@@ -1,4 +1,4 @@
-import { Entity, Column, ObjectIdColumn } from 'typeorm';
+import { Entity, Column, ObjectIdColumn, CreateDateColumn } from 'typeorm';
 
 @Entity()
 class ImageDimensions {
@@ -28,7 +28,7 @@ class Image {
   thumbPath: string | null;
   @Column({ type: 'text', nullable: true })
   scene: string | null;
-  @Column({ type: 'timestamp' })
+  @CreateDateColumn({ type: 'timestamp'})
   addedOn: number;
   @Column({ default: false })
   favorite: boolean;

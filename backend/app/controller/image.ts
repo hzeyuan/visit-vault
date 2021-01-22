@@ -6,15 +6,10 @@ export default class ImageController extends Controller {
   public async image() {
     console.log('image', this.ctx.params);
     const image = await this.service.image.getById(this.ctx.params.image);
-    // todo :返回一个image对象
-    // const image = {
-    //     path:'public/flags/ad.svg'
-    // } as Image;
     if (image && image.path) {
       const resolved = path.resolve(`${image.path}`);
       if (!fs.existsSync(resolved)) this.ctx.redirect('/broken');
       else {
-
         this.ctx.redirect(`/${image.path}`);
       }
     } else {
@@ -22,7 +17,6 @@ export default class ImageController extends Controller {
     }
   }
   public async imageThumbnail() {
-    // const image = await Image.getById(req.params.image);
     const image = await this.service.image.getById(this.ctx.params.image);
     if (image && image.thumbPath) {
       const resolved = path.resolve(`${image.thumbPath}`);
@@ -44,6 +38,4 @@ export default class ImageController extends Controller {
       this.ctx.redirect('/broken');
     }
   }
-
-
 }

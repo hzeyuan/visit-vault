@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ObjectID, ObjectIdColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ObjectID, ObjectIdColumn, CreateDateColumn } from 'typeorm';
 import Image from '../sys/Image';
 
 @Entity()
@@ -9,7 +9,7 @@ class Actor {
     name: string;
     @Column({ type: 'array', default: [], generated: true })
     aliases: string[];
-    @Column({ type: 'timestamp' })
+    @CreateDateColumn({ type: 'timestamp'})
     addedOn: number
     @Column({ type: 'number', nullable: true })
     bornOn: number | null;

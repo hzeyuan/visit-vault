@@ -1,7 +1,6 @@
 import { Service } from 'egg';
 import LabelledItem from '../entity/sys/LabelledItem'
 import { mapAsync } from '../utils/async';
-import { generateHash } from '../utils/hash';
 export default class LabelItemService extends Service {
 
     public async create(_labelledItem: LabelledItem | undefined) {
@@ -31,7 +30,6 @@ export default class LabelItemService extends Service {
         await mapAsync(ids, async (id: string) => {
             console.log('id', id.toString());
             await this.ctx.repo.LabelledItem.manager.delete(LabelledItem, { _id: id.toString() });
-            // await this.ctx.repo.Image.createQueryBuilder('image').where('image._id = :id', { id }).delete().execute();
         });
     }
     public async insert(_labelledItem: LabelledItem | LabelledItem[]) {
