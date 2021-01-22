@@ -21,27 +21,6 @@ export = {
       const { query } = options;
       const { skip, page, take } = query;
       const timeNow = +new Date();
-      //  这里需要先实现actor_ref
-      // 通过actor_ref找到，image_id,聚合起来
-      // 需要过滤作者
-
-
-
-      // const actor = { _id: 'a', name: 'actor', aliases: ['actor'], favorite: true, customFields: { _id: 'customFields', name: '' }, availableFields: [{ _id: 'c', name: 't', type: 'STRING' }] } as Actor;
-      // const imgs = await mapAsync(images, async (img) => {
-      //   // img['labels'] = [label];
-      //   const labels = await ctx.service.label.getForItem(img._id);
-      //   // const actors = await ctx.service.actor.getForItem(img._id);
-      //   img['labels'] = labels;
-
-      //   img.actors = [];
-      //   return img;
-      // });
-      // return {
-      //   numItems: total,
-      //   numPages: Math.ceil(total / 20),
-      //   items: imgs,
-      // };
       return await ctx.service.image.searchImages(query);
     },
   },
@@ -267,24 +246,25 @@ export = {
             imageLabels.push(...existingLabelIds);
           }
           // 设置作者
-          // if (Array.isArray(options.opts.actors)) {
-          //   const actorIds = [...new Set(options.opts.actors)];
-          //   await Image.setActors(image, actorIds);
+          if (Array.isArray(options.opts.actors)) {
+            const actorIds = [...new Set(options.opts.actors)];
+            await ctx.service.image.setActors(image, actorIds);
 
-          //   if (
-          //     config.matching.applyActorLabels.includes(
-          //       ApplyActorLabelsEnum.enum["event:image:update"]
-          //     )
-          //   ) {
-          //     const actors = await Actor.getBulk(actorIds);
-          //     const actorLabelIds = (await mapAsync(actors, Actor.getLabels))
-          //       .flat()
-          //       .map((label) => label._id);
+            // 这里是设置作者后，把作者的标签添加到图片中去。
+            // if (
+            //   config.matching.applyActorLabels.includes(
+            //     ApplyActorLabelsEnum.enum["event:image:update"]
+            //   )
+            // ) {
+            //   const actors = await Actor.getBulk(actorIds);
+            //   const actorLabelIds = (await mapAsync(actors, Actor.getLabels))
+            //     .flat()
+            //     .map((label) => label._id);
 
-          //     logger.log("Applying actor labels to image");
-          //     imageLabels.push(...actorLabelIds);
-          //   }
-          // }
+            //   logger.log("Applying actor labels to image");
+            //   imageLabels.push(...actorLabelIds);
+            // }
+          }
 
           // // 保存到数据中
           image['labels'] = await ctx.service.image.setLabels(image, imageLabels);

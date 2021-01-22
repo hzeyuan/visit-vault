@@ -13,4 +13,8 @@ export default class ActorReferenceService extends Service {
     public async getByActor(actor: string): Promise<ActorReference[]> {
         return await this.ctx.repo.ActorReference.find({ actor: actor });
     }
+    public async insert(_actorReference: ActorReference | ActorReference[]) {
+        if (Array.isArray(_actorReference) && _actorReference.length === 0) return;
+        await this.ctx.repo.LabelledItem.manager.insert(ActorReference, _actorReference);
+    }
 }

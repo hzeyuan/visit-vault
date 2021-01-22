@@ -1,9 +1,10 @@
 import { Service } from 'egg';
 import { FindManyOptions } from 'typeorm';
 import Image from '../entity/sys/Image'
+import Actor from '../entity/sys/Actor';
 // import Label from '../types/label';
 import { mapAsync } from '../utils/async';
-import ActorService from './actor';
+import ActorReference from '../entity/sys/ActorReference';
 
 const DEFAULT_PAGE_SIZE = 20;
 
@@ -58,13 +59,25 @@ export default class ImageService extends Service {
   public async removeLabel() {
 
   }
+  public async getActors(image: Image): Promise<Actor[]> {
+    return await this.service.actor.getForItem(image._id);
+  }
+  public async setActors(image: Image, actorIds: string[]) {
+    if (actorIds.length == 0) return [];
+    await this.service.actor.setForItem(image._id, actorIds, "image");
+    return await this.ctx.service.image.getActors(image);
+  }
   // 搜索查询图片
   public async searchImages(options: ImageSearchQuery): Promise<ImageSearchResults> {
 
     // 存在作者
-    const actorsFilters = (actors?: string[] | null) => {
+    const actorsFilters = async (actors?: string[] | null) => {
+      const actorRef = await this.ctx.repo.ActorReference.find({
+        where: { actor: { $in: actors } },
+      });
+      const imageIds = actorRef.map(actor => actor.item);
       return actors && actors.length > 0 ? {
-        where: { actors: { $in: actors } },
+        where: { _id: { $in: imageIds } },
       } : {}
     }
     const ratingFilters = (rate?: number | null, key: 'eq' | 'lt' | 'lg' = 'eq') => {
@@ -93,7 +106,7 @@ export default class ImageService extends Service {
       } : {}
     }
     const filters = {
-      ...actorsFilters(options.actors),
+      ...await actorsFilters(options.actors),
       ...ratingFilters(options.rating, 'eq'),
       ...bookmarkFilters(options.bookmark),
       ...favoriteFilters(options.favorite),
@@ -109,12 +122,10 @@ export default class ImageService extends Service {
       };
     };
     const imgs = await mapAsync(images, async (img) => {
-      // img['labels'] = [label];
       const labels = await this.ctx.service.label.getForItem(img._id);
-      // const actors = await ctx.service.actor.getForItem(img._id);
-      img['labels'] = labels;
-
-      img.actors = [];
+      const actors = await this.ctx.service.actor.getForItem(img._id);
+      img.labels = labels;
+      img.actors = actors;
       return img;
     });
     return {
