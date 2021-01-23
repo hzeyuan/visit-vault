@@ -1,15 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ObjectID, ObjectIdColumn, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ObjectID, ObjectIdColumn, CreateDateColumn, BaseEntity } from 'typeorm';
 import Image from '../sys/Image';
 
 @Entity()
-class Actor {
+class Actor extends BaseEntity {
     @ObjectIdColumn({ type: "string", generated: true })
     _id: string;
     @Column()
     name: string;
     @Column({ type: 'array', default: [], generated: true })
     aliases: string[];
-    @CreateDateColumn({ type: 'timestamp'})
+    @CreateDateColumn({ type: 'timestamp' })
     addedOn: number
     @Column({ type: 'number', nullable: true })
     bornOn: number | null;

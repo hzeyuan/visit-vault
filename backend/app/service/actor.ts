@@ -17,7 +17,7 @@ export default class ActorService extends Service {
     return typeof actor !== 'undefined' ? actor : null;
   }
   public async create(_actor: Actor) {
-    const actor = await this.ctx.repo.Actor.manager.create(Actor, _actor);
+    const actor = this.ctx.repo.Actor.manager.create(Actor, _actor);
     return this.ctx.repo.Actor.manager.save(actor);
   }
   public async getPage(page: number | undefined, skip: number | undefined, take: number | undefined) {
@@ -30,8 +30,14 @@ export default class ActorService extends Service {
   public async count() {
     return await this.ctx.repo.Actor.manager.count(Actor);
   }
-  public async remove(id: string) {
-    await this.ctx.repo.Actor.manager.delete(Actor, { _id: id });
+  public async remove(actor: Actor | null) {
+    if (!actor) return false;
+    await this.ctx.repo.Actor.manager.delete(Actor, { _id: actor._id });
+    // 删除对应作者的标签
+    await this.ctx.service.labelledItem.removeByItem(actor._id);
+    // 删除对应作者的关联图片。
+    await this.ctx.service.actorReference.removeByItem(actor._id);
+
     return true
   }
   public async getBulk(_ids: string[]): Promise<Actor[]> {
@@ -60,9 +66,9 @@ export default class ActorService extends Service {
   }
   public async setLabels(actor: Actor, labelIds: string[]) {
     if (labelIds.length == 0) return [];
+    // 为actor设置标签
     await this.service.label.setForItem(actor._id, labelIds, "actor");
     return await this.ctx.service.actor.getLabels(actor);
-    // return this.setForItem(actor._id, labelIds, "actor");
   }
   public async upsert(_actor: Actor) {
     const actor = this.ctx.repo.Actor.manager.create(Actor, _actor);

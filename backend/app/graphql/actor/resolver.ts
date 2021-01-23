@@ -51,35 +51,16 @@ export = {
     },
   },
   Mutation: {
+    // Promise<Mutation['addActor']>
     addActor: async (root, options: MutationAddActorArgs, ctx: Context) => {
-      // const config = getConfig();
-      const { logger } = ctx;
       const aliases = filterInvalidAliases(options.aliases || []);
-      const actor = await ctx.service.actor.create({ name: options.name, aliases, favorite: false } as Actor);
-      // let actor = new Actor(options.name, aliases);
-
-      let actorLabels = [] as string[];
-      if (options.labels) {
-        actorLabels = options.labels;
-      }
-
-      // 插件相关设置
-      // try {
-      //   let a  = await ctx.service.actor.onActorCreate(actor, actorLabels);
-      // } catch (error) {
-      //   logger.error(error);
-      // }
-      // 给lactor设置label
-      await ctx.service.actor.setLabels(actor, actorLabels);
-      // await actorCollection.upsert(actor._id, actor);
-      // await Actor.findUnmatchedScenes(
-      //   actor,
-      //   config.matching.applyActorLabels.includes(ApplyActorLabelsEnum.enum["event:actor:create"])
-      //     ? actorLabels
-      //     : []
-      // );
-      // await indexActors([actor]);
-      return actor;
+      let actor = ctx.repo.Actor.manager.create(Actor, { name: options.name, aliases, favorite: false });
+      actor = await actor.save();
+      // 给actor设置label
+      let actorLabels = [] || options.labels;
+      actor['labels'] = await ctx.service.actor.setLabels(actor, actorLabels);
+      actor['numScenes'] = 0
+      return actor
     },
     updateActors: async (root, options: MutationUpdateActorsArgs, ctx: Context) => {
       const { ids, opts } = options;
@@ -198,8 +179,19 @@ export = {
       // await indexActors(updatedActors);
       return updatedActors;
     },
-    removeActors: async () => {
+    removeActors: async (root, options: MutationRemoveActorsArgs, ctx: Context) => {
+      const { ids } = options;
+      for (const id of ids) {
+        const actor = await ctx.service.actor.getById(id);
+        return await ctx.service.actor.remove(actor);
+        // if (actor) {
 
+        //   // await removeActors([actor._id]);
+        //   // await LabelledItem.removeByItem(actor._id);
+        //   // await ActorReference.removeByActor(actor._id);
+        // }
+      }
+      return false;
     },
     runActorPlugins: async () => {
     },

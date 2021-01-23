@@ -19,13 +19,12 @@ export default class LabelItemService extends Service {
     public async getByType(type: string): Promise<LabelledItem[]> {
         return await this.ctx.repo.LabelledItem.manager.find(LabelledItem, { type })
     }
-    public async remove(item: string, label: string): Promise<boolean> {
-        this.ctx.repo.LabelledItem.manager.delete(LabelledItem, { item, label }).catch(() => {
+    public async remove(itemId: string, labelId: string): Promise<boolean> {
+        this.ctx.repo.LabelledItem.manager.delete(LabelledItem, { item: itemId, label: labelId }).catch(() => {
             return false
         });
         return true;
     }
-
     public async removes(ids: string[]) {
         await mapAsync(ids, async (id: string) => {
             console.log('id', id.toString());
@@ -38,5 +37,13 @@ export default class LabelItemService extends Service {
     }
     public async removeByLabel(id: string) {
 
+    }
+    public async removeById(id: string): Promise<void> {
+        await this.ctx.repo.LabelledItem.manager.delete(LabelledItem, { id });
+    }
+    public async removeByItem(id: string) {
+        for (const ref of await this.getByItem(id)) {
+            await this.removeById(ref._id);
+        }
     }
 }

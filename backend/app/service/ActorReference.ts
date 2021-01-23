@@ -17,4 +17,12 @@ export default class ActorReferenceService extends Service {
         if (Array.isArray(_actorReference) && _actorReference.length === 0) return;
         await this.ctx.repo.LabelledItem.manager.insert(ActorReference, _actorReference);
     }
+    public async removeById(id: string): Promise<void> {
+        await this.ctx.repo.ActorReference.manager.delete(ActorReference, { id });
+    }
+    public async removeByItem(id: string) {
+        for (const ref of await this.getByItem(id)) {
+            await this.removeById(ref._id);
+        }
+    }
 }

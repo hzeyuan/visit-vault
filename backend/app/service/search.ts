@@ -13,11 +13,12 @@ export default class SearchService extends Service {
     }
     // 过滤作者
     public async labelsFilters(labels?: string[] | null) {
+        if (!labels) return {};
         const labelRef = await this.ctx.repo.LabelledItem.find({
             where: { label: { $in: labels } },
         });
         const imageIds = labelRef.map(label => label.item);
-        return labels && labels.length > 0 ? {
+        return labels.length > 0 ? {
             where: { _id: { $in: imageIds } },
         } : {}
     }
