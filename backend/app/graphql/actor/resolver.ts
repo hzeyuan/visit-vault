@@ -1,12 +1,14 @@
 import { Context } from 'egg';
 import Actor from '../../entity/sys/Actor';
 import { mapAsync } from '../../utils/async';
-// import { isValidCountryCode } from '../../types/countries';
 import { filterInvalidAliases, isArrayEq } from '../../utils/misc';
 
 export = {
 
   Query: {
+    numActors: async (root, options, ctx: Context) => {
+      return await ctx.service.actor.count();
+    },
     getActors: async (root, options: QueryGetActorsArgs, ctx: Context): Promise<| {
       numItems: number,
       numPages: number,
@@ -15,7 +17,6 @@ export = {
       | undefined> => {
       const { query } = options;
       const { skip, page, take } = query;
-      // let actors = await ctx.service.actor.all();
       const actors = await ctx.service.actor.getPage(page!, skip!, take!);
       const total = actors.length;
       if (total === 0) {
@@ -44,10 +45,8 @@ export = {
       actor['numScenes'] = 0
       actor.customFields = {};
       actor['collabs'] = [];
-      // actor.avatar = 'https://avatars2.githubusercontent.com/u/29333699?s=460&u=0c288b893224afe4d909bc4bc8ef0524805b480d&v=4'
       actor['labels'] = []
       return actor;
-
     },
   },
   Mutation: {
@@ -185,7 +184,6 @@ export = {
         const actor = await ctx.service.actor.getById(id);
         return await ctx.service.actor.remove(actor);
         // if (actor) {
-
         //   // await removeActors([actor._id]);
         //   // await LabelledItem.removeByItem(actor._id);
         //   // await ActorReference.removeByActor(actor._id);

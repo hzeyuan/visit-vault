@@ -13,7 +13,9 @@ export default class LabelService extends Service {
         const label = this.ctx.repo.Label.manager.create(Label, { ..._label });
         return await this.ctx.repo.Label.manager.save(label);
     }
-
+    public async count() {
+        return await this.ctx.repo.Actor.manager.count(Label);
+    }
     public async update(id: string, _label: Label) {
         return await this.ctx.repo.Label.manager.update(Label, id, _label);
     }

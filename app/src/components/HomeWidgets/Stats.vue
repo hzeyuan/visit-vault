@@ -45,7 +45,7 @@ export default class Stats extends Vue {
         {
           numScenes
           numActors
-          numMovies
+          # numMovies
           numImages
         }
       `,

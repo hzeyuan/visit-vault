@@ -482,7 +482,7 @@ export default class ActorList extends mixins(DrawerMixin) {
                 _id
                 color
               }
-              numScenes
+              # numScenes
             }
           }
           ${actorFragment}

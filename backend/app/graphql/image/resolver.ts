@@ -17,6 +17,9 @@ function isHexColorString(str: string) {
 
 export = {
   Query: {
+    numImages: async (root, options, ctx: Context) => {
+      return ctx.service.image.count();
+    },
     getImages: async (root, options: QueryGetImagesArgs, ctx: Context): Promise<Query['getImages']> => {
       const { query } = options;
       const { skip, page, take } = query;
@@ -249,7 +252,7 @@ export = {
           if (Array.isArray(options.opts.actors)) {
             const actorIds = [...new Set(options.opts.actors)];
             await ctx.service.image.setActors(image, actorIds);
-            
+
             // 这里是设置作者后，把作者的标签添加到图片中去。
             // if (
             //   config.matching.applyActorLabels.includes(

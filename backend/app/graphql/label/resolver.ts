@@ -15,6 +15,9 @@ function isHexColorString(str: string) {
 export = {
 
   Query: {
+    numLabels: async (root, options, ctx: Context) => {
+      return await ctx.service.label.count();
+    },
     getLabels: async (root, _, ctx: Context): Promise<Query['getLabels']> => {
       console.log(ctx, root);
       const labels = await ctx.service.label.all();
