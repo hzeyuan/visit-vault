@@ -64,41 +64,20 @@ export = {
         const sceneInDb = await ctx.service.scene.getById(options.scene);
         if (!sceneInDb) throw new Error(`Scene ${options.scene} not found`);
       }
-      // const config = getConfig();
-      const { filename, mimetype, createReadStream } = await options.file;
-      const ext = getExtension(filename); // 文件后缀
-      const fileNameWithoutExtension = filename.split(".")[0]; // 文件前缀
+      const { filename } = await options.file;
 
-      let imageName = fileNameWithoutExtension;
-
-      if (options.name) {
-        imageName = options.name;
-      }
-
-      //不是图片格式
-      if (!mimetype.includes("image/")) {
-        throw new Error("Invalid file");
-      }
+      // 创建文件唯一标识符
       const _id = new ObjectID().toString();
-      const image = ctx.repo.Image.manager.create(Image, { _id, name: imageName, meta: new ImageMeta(), favorite: false });
+      // 上传图片
+      const outPath = await ctx.upload(options.file, _id);
+      ctx.logger.info(`uploading done=> ${outPath}`);
 
-      const outPath = `/tmp/${image._id}${ext}`;
-      ctx.logger.info(`Getting file...`);
-
-      // 读写流
-      const read = createReadStream() as ReadStream;
-      const write = createWriteStream(outPath);
-
-      const pipe = read.pipe(write);
-      await new Promise<void>((resolve) => {
-        pipe.on("close", () => resolve());
-      });
-
+      
+      const image = ctx.repo.Image.manager.create(Image, { _id, name: options.name || _id, meta: new ImageMeta(), favorite: false });
       const { size } = await statAsync(outPath);
       image.meta.size = size;
 
       // File written, now process
-      ctx.logger.info(`File written to ${outPath}.`);
       let processedExt = ".jpg";
       if (options.lossless === true) {
         processedExt = ".png";
@@ -106,72 +85,75 @@ export = {
       if (filename.includes(".gif")) {
         processedExt = ".gif";
       }
-
+      // 从临时目录 copy到图片资源目录
       const sourcePath = libraryPath(`images/${image._id}${processedExt}`);
       image.path = sourcePath;
-
+      await copyFileAsync(outPath, sourcePath);
       // Process image
-      if (!filename.includes(".gif")) {
-        if (options.crop) {
-          options.crop.left = Math.round(options.crop.left);
-          options.crop.top = Math.round(options.crop.top);
-          options.crop.width = Math.round(options.crop.width);
-          options.crop.height = Math.round(options.crop.height);
-        }
+      // if (!filename.includes(".gif")) {
+      //   if (options.crop) {
+      //     options.crop.left = Math.round(options.crop.left);
+      //     options.crop.top = Math.round(options.crop.top);
+      //     options.crop.width = Math.round(options.crop.width);
+      //     options.crop.height = Math.round(options.crop.height);
+      //   }
 
-        const _image = await Jimp.read(outPath);
-        image.hash = _image.hash();
+      //   const _image = await Jimp.read(outPath);
+      //   image.hash = _image.hash();
 
-        if (options.crop) {
-          ctx.logger.info(`Cropping image...`);
-          _image.crop(options.crop.left, options.crop.top, options.crop.width, options.crop.height);
-          image.meta.dimensions.width = options.crop.width;
-          image.meta.dimensions.height = options.crop.height;
-        } else {
-          image.meta.dimensions.width = _image.bitmap.width;
-          image.meta.dimensions.height = _image.bitmap.height;
-        }
+      //   if (options.crop) {
+      //     ctx.logger.info(`Cropping image...`);
+      //     _image.crop(options.crop.left, options.crop.top, options.crop.width, options.crop.height);
+      //     image.meta.dimensions.width = options.crop.width;
+      //     image.meta.dimensions.height = options.crop.height;
+      //   } else {
+      //     image.meta.dimensions.width = _image.bitmap.width;
+      //     image.meta.dimensions.height = _image.bitmap.height;
+      //   }
 
-        if (options.compress === true) {
-          ctx.logger.info("Resizing image to thumbnail size");
-          // 最大的压缩空间
-          const MAX_SIZE = 10 * 1024
-          // const MAX_SIZE = config.processing.imageCompressionSize;
+      //   if (options.compress === true) {
+      //     ctx.logger.info("Resizing image to thumbnail size");
+      //     // 最大的压缩空间
+      //     const MAX_SIZE = 10 * 1024
+      //     // const MAX_SIZE = config.processing.imageCompressionSize;
 
-          if (_image.bitmap.width > _image.bitmap.height && _image.bitmap.width > MAX_SIZE) {
-            _image.resize(MAX_SIZE, Jimp.AUTO);
-          } else if (_image.bitmap.height > MAX_SIZE) {
-            _image.resize(Jimp.AUTO, MAX_SIZE);
-          }
-        }
+      //     if (_image.bitmap.width > _image.bitmap.height && _image.bitmap.width > MAX_SIZE) {
+      //       _image.resize(MAX_SIZE, Jimp.AUTO);
+      //     } else if (_image.bitmap.height > MAX_SIZE) {
+      //       _image.resize(Jimp.AUTO, MAX_SIZE);
+      //     }
+      //   }
 
-        await _image.writeAsync(sourcePath);
-        // !isBlacklisted(image.name)
-        if (true) {
-          image.thumbPath = libraryPath(`thumbnails/images/${image._id}.jpg`);
-          ctx.logger.info("Creating image thumbnail");
-          // Small image thumbnail
-          if (_image.bitmap.width > _image.bitmap.height && _image.bitmap.width > 320) {
-            _image.resize(320, Jimp.AUTO);
-          } else if (_image.bitmap.height > 320) {
-            _image.resize(Jimp.AUTO, 320);
-          }
-          await _image.writeAsync(image.thumbPath);
-        }
+      //   await _image.writeAsync(sourcePath);
+      //   // !isBlacklisted(image.name)
+      //   if (true) {
+      //     image.thumbPath = libraryPath(`thumbnails/images/${image._id}.jpg`);
+      //     ctx.logger.info("Creating image thumbnail");
+      //     // Small image thumbnail
+      //     if (_image.bitmap.width > _image.bitmap.height && _image.bitmap.width > 320) {
+      //       _image.resize(320, Jimp.AUTO);
+      //     } else if (_image.bitmap.height > 320) {
+      //       _image.resize(Jimp.AUTO, 320);
+      //     }
+      //     await _image.writeAsync(image.thumbPath);
+      //   }
 
-        ctx.logger.info(`Image processing done.`);
-      } else {
-        await copyFileAsync(outPath, sourcePath);
-      }
+      //   ctx.logger.info(`Image processing done.`);
+      // } else {
+      //   await copyFileAsync(outPath, sourcePath);
+      // }
 
+      // 图片设置作者
       let actorIds = [] as string[];
       if (options.actors) {
         actorIds = options.actors;
+        image.actors = await ctx.service.image.setActors(image, actorIds);
       }
-
+      // 图片设置标签
       let labels = [] as string[];
       if (options.labels) {
         labels = options.labels;
+        image['labels'] = await ctx.service.image.setLabels(image, labels);
       }
 
       if (options.scene) {
@@ -185,46 +167,10 @@ export = {
         }
       }
 
-      // if (options.studio) {
-      //   const studio = await Studio.getById(options.studio);
-      //   if (studio) image.studio = options.studio;
-      // }
 
-      // Extract actors
-      // const extractedActors = await extractActors(image.name);
-
-      // ctx.logger.info(`Found ${extractedActors.length} actors in image path.`);
-      // actorIds.push(...extractedActors);
-      // await Image.setActors(image, actorIds);
-
-      // // Extract labels
-      // const extractedLabels = await extractLabels(image.name);
-      // ctx.logger.info(`Found ${extractedLabels.length} labels in image path.`);
-      // labels.push(...extractedLabels);
-
-      // if (
-      //   config.matching.applyActorLabels.includes(ApplyActorLabelsEnum.enum["event:image:create"])
-      // ) {
-      //   ctx.logger.info("Applying actor labels to image");
-      //   const actors = await Actor.getBulk(actorIds);
-      //   const actorLabels = (
-      //     await mapAsync(actors, async (actor) => (await Actor.getLabels(actor)).map((l) => l._id))
-      //   ).flat();
-      //   labels.push(...actorLabels);
-      // }
-
-      // await Image.setLabels(image, labels);
-
-      // Done
-      ctx.logger.info(`image creating=> ${JSON.stringify(image)}`);
       await ctx.service.image.upsert(image);
-      // await imageCollection.upsert(image._id, image);
-      // await indexImages([image]);
       await unlinkAsync(outPath);
-      ctx.logger.info(`Image '${imageName}' done.`);
-      // 作者和标签，先使用假数据
-      image.actors = [];
-      image['labels'] = [];
+      ctx.logger.info(`image done=> ${image.name}`);
       return image
     },
     updateImages: async (
@@ -252,21 +198,6 @@ export = {
           if (Array.isArray(options.opts.actors)) {
             const actorIds = [...new Set(options.opts.actors)];
             await ctx.service.image.setActors(image, actorIds);
-
-            // 这里是设置作者后，把作者的标签添加到图片中去。
-            // if (
-            //   config.matching.applyActorLabels.includes(
-            //     ApplyActorLabelsEnum.enum["event:image:update"]
-            //   )
-            // ) {
-            //   const actors = await Actor.getBulk(actorIds);
-            //   const actorLabelIds = (await mapAsync(actors, Actor.getLabels))
-            //     .flat()
-            //     .map((label) => label._id);
-
-            //   logger.log("Applying actor labels to image");
-            //   imageLabels.push(...actorLabelIds);
-            // }
           }
 
           // // 保存到数据中
@@ -327,28 +258,6 @@ export = {
       ctx.logger.info('remove Label ...');
       const { item, label } = options;
       return await ctx.service.labelledItem.remove(item, label);
-      // await LabelledItem.remove(item, label);
-      // if (item.startsWith("sc_")) {
-      //   const scene = await Scene.getById(item);
-      //   if (scene) {
-      //     await indexScenes([scene]);
-      //   }
-      // } else if (item.startsWith("im_")) {
-      //   const image = await Image.getById(item);
-      //   if (image) {
-      //     await indexImages([image]);
-      //   }
-      // } else if (item.startsWith("st_")) {
-      //   const studio = await Studio.getById(item);
-      //   if (studio) {
-      //     await indexStudios([studio]);
-      //   }
-      // } else if (item.startsWith("ac_")) {
-      //   const actor = await Actor.getById(item);
-      //   if (actor) {
-      //     await indexActors([actor]);
-      //   }
-      // }
     }
   }
 };

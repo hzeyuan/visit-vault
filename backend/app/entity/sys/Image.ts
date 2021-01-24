@@ -1,5 +1,5 @@
 import { Entity, Column, ObjectIdColumn, CreateDateColumn } from 'typeorm';
-
+import Actor from './Actor';
 @Entity()
 class ImageDimensions {
   @Column({ type: 'number', nullable: true })
@@ -28,7 +28,7 @@ class Image {
   thumbPath: string | null;
   @Column({ type: 'text', nullable: true })
   scene: string | null;
-  @CreateDateColumn({ type: 'timestamp'})
+  @CreateDateColumn({ type: 'timestamp' })
   addedOn: number;
   @Column({ default: false })
   favorite: boolean;
@@ -41,7 +41,7 @@ class Image {
   @Column(type => ImageMeta)
   meta: ImageMeta;
   @Column({ type: 'array', nullable: true })
-  actors?: string[] | undefined;
+  actors?: Actor[] | undefined;
   @Column({ type: 'text', nullable: true, default: '' })
   studio: string | null;
   @Column({ type: 'string' })

@@ -1,4 +1,4 @@
-import { Context } from 'egg';
+ import { Context } from 'egg';
 
 
 export = {
