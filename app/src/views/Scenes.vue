@@ -147,6 +147,14 @@
         </div>
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
+            <v-btn v-on="on" @click="openCreateDialog" icon>
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </template>
+          <span>Add Scene</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
             <v-btn v-on="on" :loading="fetchingRandom" @click="getRandom" icon>
               <v-icon>mdi-shuffle-variant</v-icon>
             </v-btn>
@@ -811,6 +819,7 @@ export default class SceneList extends mixins(DrawerMixin) {
 
   mounted() {
     if (!this.scenes.length) this.refreshPage();
+    this.openUploadDialog();
   }
 
   beforeMount() {

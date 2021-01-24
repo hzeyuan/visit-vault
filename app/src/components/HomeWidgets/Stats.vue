@@ -12,9 +12,14 @@
     </div>
     <v-divider></v-divider>
 
-    <div class="my-3">
+    <!-- <div class="my-3">
       <span class="mr-2 d-inline-block display-1">{{ numMovies }}</span>
       <span class="subtitle-1">movies</span>
+    </div> -->
+
+    <div class="my-3">
+      <span class="mr-2 d-inline-block display-1">{{ numLabels }}</span>
+      <span class="subtitle-1">labels</span>
     </div>
     <v-divider></v-divider>
 
@@ -38,7 +43,7 @@ export default class Stats extends Vue {
   numActors = 0;
   numMovies = 0;
   numImages = 0;
-
+  numLabels = 0;
   beforeMount() {
     ApolloClient.query({
       query: gql`
@@ -47,6 +52,7 @@ export default class Stats extends Vue {
           numActors
           # numMovies
           numImages
+          numLabels
         }
       `,
     })
@@ -55,6 +61,7 @@ export default class Stats extends Vue {
         this.numActors = res.data.numActors;
         this.numMovies = res.data.numMovies;
         this.numImages = res.data.numImages;
+        this.numLabels = res.data.numLabels;
       })
       .catch((err) => {
         console.error(err);

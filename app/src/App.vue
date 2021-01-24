@@ -290,21 +290,21 @@ export default class App extends Vue {
         text: "Actors",
         url: "/actors",
       },
-      {
-        icon: "mdi-filmstrip-box-multiple",
-        text: "Movies",
-        url: "/movies",
-      },
+      // {
+      //   icon: "mdi-filmstrip-box-multiple",
+      //   text: "Movies",
+      //   url: "/movies",
+      // },
       {
         icon: "mdi-label",
         text: "Labels",
         url: "/labels",
       },
-      {
-        icon: "mdi-camera",
-        text: "Studios",
-        url: "/studios",
-      },
+      // {
+      //   icon: "mdi-camera",
+      //   text: "Studios",
+      //   url: "/studios",
+      // },
       {
         icon: "mdi-image",
         text: "Images",

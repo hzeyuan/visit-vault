@@ -1800,6 +1800,7 @@ export default class ActorDetails extends Vue {
   beforeMount() {
     this.onLoad();
     this.loadCollabs();
+    
   }
 
   mounted() {
