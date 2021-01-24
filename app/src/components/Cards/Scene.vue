@@ -1,9 +1,20 @@
 <template>
-  <v-card :dark="!!cardColor || $vuetify.theme.dark" tile :color="cardColor" v-if="value">
+  <v-card
+    :dark="!!cardColor || $vuetify.theme.dark"
+    tile
+    :color="cardColor"
+    v-if="value"
+  >
     <a :href="`#/scene/${value._id}`">
       <v-hover>
         <template v-slot:default="{ hover }">
-          <v-img cover :aspect-ratio="aspectRatio" v-ripple eager :src="thumbnail">
+          <v-img
+            cover
+            :aspect-ratio="aspectRatio"
+            v-ripple
+            eager
+            src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=3580870614,3434300052&fm=26&gp=0.jpg"
+          >
             <v-fade-transition>
               <div
                 @mouseenter="mouseenter"
@@ -12,7 +23,13 @@
                 style="position: absolute: top: 0; left: 0; width: 100%; height: 100%"
               >
                 <div style="width: 100%; height: 100%; position: relative">
-                  <video class="video-insert" ref="video" autoplay muted :src="videoPath" />
+                  <video
+                    class="video-insert"
+                    ref="video"
+                    autoplay
+                    muted
+                    :src="videoPath"
+                  />
                 </div>
               </div>
             </v-fade-transition>
@@ -92,7 +109,11 @@
     </v-card-subtitle>
     <Rating @change="rate" class="ml-3 mb-2" :value="value.rating" />
     <div class="py-1 px-4" v-if="value.labels.length && showLabels">
-      <label-group :allowRemove="false" :item="value._id" v-model="value.labels" />
+      <label-group
+        :allowRemove="false"
+        :item="value._id"
+        v-model="value.labels"
+      />
     </div>
   </v-card>
 </template>

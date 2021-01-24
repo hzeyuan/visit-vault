@@ -32,16 +32,16 @@ export default gql`
         height
       }
     }
-    watches
+    # watches
     streamLinks
     path
     customFields
-    availableFields {
-      _id
-      name
-      type
-      values
-      unit
-    }
+    # availableFields {
+    #   _id
+    #   name
+    #   type
+    #   values
+    #   unit
+    # }
   }
 `;
