@@ -3,7 +3,7 @@ import LabelledItem from '../entity/sys/LabelledItem'
 import { mapAsync } from '../utils/async';
 export default class LabelItemService extends Service {
 
-    public async create(_labelledItem: LabelledItem | undefined) {
+    public async upsert(_labelledItem: LabelledItem | undefined) {
         const labelledItem = this.ctx.repo.LabelledItem.manager.create(LabelledItem, { ..._labelledItem });
         return this.ctx.repo.LabelledItem.manager.save(labelledItem);
     }
@@ -31,7 +31,7 @@ export default class LabelItemService extends Service {
             await this.ctx.repo.LabelledItem.manager.delete(LabelledItem, { _id: id.toString() });
         });
     }
-    public async insert(_labelledItem: LabelledItem | LabelledItem[]) {
+    public async addBulk(_labelledItem: LabelledItem | LabelledItem[]) {
         if (Array.isArray(_labelledItem) && _labelledItem.length === 0) return;
         await this.ctx.repo.LabelledItem.manager.insert(LabelledItem, _labelledItem);
     }

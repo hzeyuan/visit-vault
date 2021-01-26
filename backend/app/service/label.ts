@@ -8,7 +8,7 @@ export default class LabelService extends Service {
         const label = await this.ctx.repo.Label.manager.findOne(Label, id);
         return label;
     }
-    public async create(_label: Label | undefined) {
+    public async upsert(_label: Label | undefined) {
         const label = this.ctx.repo.Label.manager.create(Label, { ..._label });
         return await this.ctx.repo.Label.manager.save(label);
     }
@@ -21,29 +21,16 @@ export default class LabelService extends Service {
     public async all(): Promise<Label[]> {
         return await this.ctx.repo.Label.manager.find(Label);
     }
+    public async remove(id: string) {
+        return await this.ctx.repo.Label.manager.delete(Label, { id });
+    }
     public async getBulk(_ids: string[]): Promise<Label[]> {
         const ids = _ids.map(id => new ObjectID(id));
         return await this.ctx.repo.Label.findByIds(ids);
     }
-    public async addForItem(itemId: string, labelIds: string[], type: string): Promise<void> {
-        const oldRefs = await this.service.LabelledItem.getByItem(itemId);
-        const { added } = arrayDiff(oldRefs, [...new Set(labelIds)], "label", (l) => l);
-        for (const id of added) {
-            const labelledItem = {
-                item: itemId,
-                label: id,
-                type
-            } as LabelledItem;
-            this.ctx.logger.info(`Adding label: ${JSON.stringify(labelledItem)}`);
-            await this.service.labelledItem.create(labelledItem);
-        }
-    }
     public async getForItem(id: string): Promise<Label[]> {
         const references = await this.service.labelledItem.getByItem(id);
         return await this.service.label.getBulk(references.map((r) => r.label));
-    }
-    public async remove(id: string) {
-        return await this.ctx.repo.Label.manager.delete(Label, { id });
     }
     public async setForItem(itemId: string, labelIds: string[], type: string): Promise<void> {
         const oldRefs = await this.service.labelledItem.getByItem(itemId);

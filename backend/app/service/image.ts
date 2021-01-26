@@ -4,11 +4,7 @@ import Image from '../entity/sys/Image'
 import Actor from '../entity/sys/Actor';
 import { mapAsync } from '../utils/async';
 
-const DEFAULT_PAGE_SIZE = 20;
 
-const getPageSize = (take?: number | null): number => {
-  return take || DEFAULT_PAGE_SIZE;
-}
 
 
 export default class ImageService extends Service {
@@ -62,7 +58,7 @@ export default class ImageService extends Service {
   }
   // 搜索查询图片
   public async searchImages(options: ImageSearchQuery): Promise<ImageSearchResults> {
-    const pageSize = getPageSize(options.take || null);
+    const pageSize = getPageSize(options.take);
     const filters = {
       ...await this.service.search.actorsFilters(options.actors),
       ...await this.service.search.labelsFilters(options.include),

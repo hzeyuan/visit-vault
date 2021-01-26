@@ -4,38 +4,26 @@ import * as path from 'path';
 
 export default class ImageController extends Controller {
   public async image() {
-    console.log('image', this.ctx.params);
     const image = await this.service.image.getById(this.ctx.params.image);
-    if (image && image.path) {
-      const resolved = path.resolve(`${image.path}`);
-      if (!fs.existsSync(resolved)) this.ctx.redirect('/broken');
-      else {
-        this.ctx.redirect(`/${image.path}`);
-      }
-    } else {
-      this.ctx.redirect('/broken');
-    }
+    this.logger.info(`1.获取到图片 ==>${image!.name}`);
+    // 数据库中没有找到记录
+    if (!image) this.ctx.redirect('/broken');
+    // 获取绝对路径
+    const resolved = path.resolve(`${image!.path}`);
+    // 存在图片资源 =>跳转到图片资源
+    if (!fs.existsSync(resolved)) this.ctx.redirect('/broken');
+    this.ctx.redirect(`/${image!.path}`);
+
   }
   public async imageThumbnail() {
     const image = await this.service.image.getById(this.ctx.params.image);
-    if (image && image.thumbPath) {
-      const resolved = path.resolve(`${image.thumbPath}`);
-      this.logger.info(`get image ==> ${image.thumbPath}`);
-      if (!fs.existsSync(resolved)) {
-        this.ctx.redirect('/broken');
-      } else {
-        this.ctx.redirect(`/${image.thumbPath}`);
-      }
-    } else if (image) {
-      const config = {
-        auth: {
-          password: '123',
-        },
-      };
-      this.logger.info(`${this.ctx.params.image}'s thumbnail does not exist (yet)`);
-      this.ctx.redirect(`/media/image/${image._id.toString()}?password=${config.auth.password}`);
-    } else {
-      this.ctx.redirect('/broken');
-    }
+    this.logger.info(`1.获取到图片 ==>${image!.name}`);
+    // 数据库中没有找到记录
+    if (!image) this.ctx.redirect('/broken');
+    const resolved = path.resolve(`${image!.thumbPath}`);
+    if (fs.existsSync(resolved)) this.ctx.redirect(`/${image!.thumbPath}`);
+    // 不存在缩略图资源 =>跳转到图片资源
+    this.ctx.redirect(`/${image!.path}`);
   }
 }
+

@@ -53,7 +53,7 @@ export = {
       } */
 
 
-      const label = await ctx.service.label.create({ name: args.name, aliases } as Label);
+      const label = await ctx.service.label.upsert({ name: args.name, aliases } as Label);
       // await labelCollection.upsert(label._id, label);
       // return label;
       return label;

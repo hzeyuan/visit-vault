@@ -12,9 +12,7 @@ import ExportImage from '../../../app/service/image';
 import ExportLabel from '../../../app/service/label';
 import ExportLabelledItem from '../../../app/service/labelledItem';
 import ExportPlugin from '../../../app/service/plugin';
-import ExportScene from '../../../app/service/scene';
 import ExportSearch from '../../../app/service/search';
-import ExportTestResource from '../../../app/service/testResource';
 
 declare module 'egg' {
   interface IService {
@@ -24,8 +22,6 @@ declare module 'egg' {
     label: AutoInstanceType<typeof ExportLabel>;
     labelledItem: AutoInstanceType<typeof ExportLabelledItem>;
     plugin: AutoInstanceType<typeof ExportPlugin>;
-    scene: AutoInstanceType<typeof ExportScene>;
     search: AutoInstanceType<typeof ExportSearch>;
-    testResource: AutoInstanceType<typeof ExportTestResource>;
   }
 }

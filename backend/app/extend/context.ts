@@ -1,5 +1,4 @@
 
-const TYPE_USER = Symbol('Context#TypeUser');
 import { createWriteStream, ReadStream } from "fs";
 import { getExtension } from "../utils/string";
 export default {
