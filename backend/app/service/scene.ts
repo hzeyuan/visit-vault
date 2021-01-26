@@ -8,7 +8,6 @@ export default class SceneService extends Service {
     return scene;
   }
   public async create(scene: Scene) {
-    console.log('create ---')
     const actor = await this.ctx.repo.Scene.manager.create(Scene, scene);
     return this.ctx.repo.Scene.manager.save(actor);
 

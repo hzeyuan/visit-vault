@@ -9,7 +9,6 @@ export default class LabelService extends Service {
         return label;
     }
     public async create(_label: Label | undefined) {
-        // const _id = `la_${generateHash()}`;
         const label = this.ctx.repo.Label.manager.create(Label, { ..._label });
         return await this.ctx.repo.Label.manager.save(label);
     }

@@ -8,7 +8,7 @@ import SysActorReference from '../app/entity/sys/ActorReference'
 import SysImage from '../app/entity/sys/Image'
 import SysLabel from '../app/entity/sys/Label'
 import SysLabelledItem from '../app/entity/sys/LabelledItem'
-import SysScene from '../app/entity/sys/Scene'
+import SysScene from '../app/entity/sys/scene'
 
 declare module 'egg' {
   interface Context {

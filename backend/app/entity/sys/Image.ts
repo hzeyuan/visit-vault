@@ -1,19 +1,17 @@
-import { Entity, Column, ObjectIdColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, ObjectIdColumn, CreateDateColumn, BaseEntity } from 'typeorm';
 import Actor from './Actor';
-@Entity()
-class ImageDimensions {
+export class ImageDimensions extends BaseEntity {
   @Column({ type: 'number', nullable: true })
-  width: number | null;
+  width: number | null = null;
   @Column({ type: 'number', nullable: true })
-  height: number | null;
+  height: number | null = null;
 }
 
-@Entity()
-class ImageMeta {
+export class ImageMeta extends BaseEntity {
   @Column({ type: 'number', nullable: true })
-  size: number | null;
+  size: number | null = null;
   @Column(type => ImageDimensions)
-  dimensions: ImageDimensions;
+  dimensions: ImageDimensions = new ImageDimensions();
 }
 
 @Entity()

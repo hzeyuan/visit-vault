@@ -27,4 +27,5 @@
     addLabel(name: String!, aliases: [String!]): Label!
     updateLabels(ids: [String!]!, opts: LabelUpdateOpts!): [Label!]!
     removeLabels(ids: [String!]!): Boolean!
+    removeLabel(item: String!, label: String!): Boolean!
   }

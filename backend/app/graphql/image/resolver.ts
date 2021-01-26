@@ -1,12 +1,9 @@
 import { Context } from 'egg';
 const Jimp = require('jimp')
-import { createWriteStream, ReadStream } from "fs";
 import { ObjectID } from 'mongodb';
-import Image from '../../entity/sys/Image';
-import { ImageMeta } from '../../types/image';
+import Image, { ImageMeta } from '../../entity/sys/Image';
 import { copyFileAsync, statAsync, unlinkAsync } from '../../utils/fs/async';
 import { libraryPath } from '../../utils/path';
-import { getExtension } from '../../utils/string';
 
 const COLOR_HEX_STRING = /^#[a-f0-9]{6}$/;
 function isHexColorString(str: string) {
@@ -72,7 +69,7 @@ export = {
       const outPath = await ctx.upload(options.file, _id);
       ctx.logger.info(`uploading done=> ${outPath}`);
 
-      
+
       const image = ctx.repo.Image.manager.create(Image, { _id, name: options.name || _id, meta: new ImageMeta(), favorite: false });
       const { size } = await statAsync(outPath);
       image.meta.size = size;
