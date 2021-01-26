@@ -14,30 +14,30 @@ type Scalars = {
   Upload: any;
 };
 
-type Actor = {
-  __typename?: 'Actor';
-  _id: Scalars['String'];
-  name: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
-  aliases: Array<Scalars['String']>;
-  addedOn: Scalars['Long'];
-  bornOn?: Maybe<Scalars['Long']>;
-  favorite: Scalars['Boolean'];
-  bookmark?: Maybe<Scalars['Long']>;
-  rating?: Maybe<Scalars['Int']>;
-  customFields: Scalars['Object'];
-  age?: Maybe<Scalars['Int']>;
-  availableFields: Array<CustomField>;
-  watches: Array<Scalars['Long']>;
-  labels: Array<Label>;
-  numScenes: Scalars['Int'];
-  avatar?: Maybe<Image>;
-  thumbnail?: Maybe<Image>;
-  altThumbnail?: Maybe<Image>;
-  hero?: Maybe<Image>;
-  collabs: Array<Actor>;
-  nationality?: Maybe<Nationality>;
-};
+// type Actor = {
+//   __typename?: 'Actor';
+//   _id: Scalars['String'];
+//   name: Scalars['String'];
+//   description?: Maybe<Scalars['String']>;
+//   aliases: Array<Scalars['String']>;
+//   addedOn: Scalars['Long'];
+//   bornOn?: Maybe<Scalars['Long']>;
+//   favorite: Scalars['Boolean'];
+//   bookmark?: Maybe<Scalars['Long']>;
+//   rating?: Maybe<Scalars['Int']>;
+//   customFields: Scalars['Object'];
+//   age?: Maybe<Scalars['Int']>;
+//   availableFields: Array<CustomField>;
+//   watches: Array<Scalars['Long']>;
+//   labels: Array<Label>;
+//   numScenes: Scalars['Int'];
+//   avatar?: Maybe<Image>;
+//   thumbnail?: Maybe<Image>;
+//   altThumbnail?: Maybe<Image>;
+//   hero?: Maybe<Image>;
+//   collabs: Array<Actor>;
+//   nationality?: Maybe<Nationality>;
+// };
 
 type ActorSearchQuery = {
   query?: Maybe<Scalars['String']>;
