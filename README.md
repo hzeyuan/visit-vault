@@ -1,7 +1,18 @@
 
 ### 介绍
 
-> 使用type-orm,egg.js，ts,mongo的本地图片管理系统。在[porn-vault](https://github.com/porn-vault/porn-vault#support)的基础上，把express换成了egg.js，es换成了mongo。
+## 在 [porn-vault](https://github.com/porn-vault/porn-vault#support) 基础上魔改.
+express -> egg.js
+es -> mongo
+
+
+> 技术栈
+
+* type-orm
+* egg.js
+* ts
+* mongo
+
 
 
  
